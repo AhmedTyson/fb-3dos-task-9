@@ -1,58 +1,217 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# <img src="https://api.iconify.design/lucide:clipboard-list.svg?color=%238A2BE2" width="32" align="top" /> Team 4 — ThreeDOS Backend — Task Session 9
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+![Status](https://img.shields.io/badge/status-active-10b981?style=flat-square)
+![Role](https://img.shields.io/badge/role-Backend_Team-8A2BE2?style=flat-square)
+![Stack](https://img.shields.io/badge/stack-Laravel_13-FF2D20?style=flat-square)
+![Session](https://img.shields.io/badge/session-Task_9-4F5B93?style=flat-square)
 
-## About Laravel
+<br />
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+RESTful API for [**project name — TBD**] built by **Team 4 Backend**. Delivers authenticated endpoints with JWT, role-based authorization (Admin/User), paginated collections, Redis caching, validated requests, and interactive API docs via Scramble. Frontend team consumes JSON responses at `/api/*` — full endpoint reference available at `/docs/api` after setup.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
-## Learning Laravel
+## <img src="https://api.iconify.design/lucide:list-checks.svg?color=%238A2BE2" width="24" align="top" /> Backend Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Authentication Module
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+The system must provide a complete authentication module that includes:
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+- User registration (Sign Up)
+- User login
+- User logout
+- JWT or token-based authentication
+- Forgot Password functionality
+- Password Reset using a secure reset token
 
-## Agentic Development
+### 2. Authorization
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+The application must implement authorization mechanisms to control access to resources. Requirements include:
 
-```bash
-composer require laravel/boost --dev
+- Role-Based Access Control (RBAC) or Permission-Based Authorization
+- Different user roles (e.g., Admin, User)
+- Protected routes based on user permissions
+- Policies or Gates for resource ownership validation
 
-php artisan boost:install
+### 3. Pagination
+
+Endpoints returning collections of data must support pagination. Requirements include:
+
+- Configurable page size
+- Current page information
+- Total number of records
+- Total pages
+- Navigation metadata (Next Page, Previous Page)
+- Support for query parameters such as:
+  - `page`
+  - `per_page`
+
+Example response metadata:
+
+```json
+{
+  "current_page": 1,
+  "per_page": 10,
+  "total": 150,
+  "last_page": 15
+}
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 4. Caching
 
-## Contributing
+The backend must utilize caching to improve application performance and reduce database load.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 5. API Validation
 
-## Code of Conduct
+All incoming requests must be validated before processing.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 6. API Documentation
 
-## Security Vulnerabilities
+The project must provide interactive API documentation.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## <img src="https://api.iconify.design/lucide:layers.svg?color=%238A2BE2" width="24" align="top" /> Tech Stack
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Layer | Technology |
+|-------|-----------|
+| Language | PHP 8.5.8 (ZTS) |
+| Framework | Laravel 13 |
+| Database | SQLite |
+| Monitoring | Laravel Telescope 5 |
+| API Documentation | Dedoc Scramble |
+| Authentication | JWT (tymon/jwt-auth) |
+| Caching | Redis (predis/predis) |
+| Testing | PHPUnit 12 / Pest |
+
+---
+
+## <img src="https://api.iconify.design/lucide:folder-tree.svg?color=%238A2BE2" width="24" align="top" /> Project Structure
+
+```
+t4-3dos-backend-task9/
+│
+├── app/
+│   ├── Http/
+│   │   └── Controllers/
+│   ├── Models/
+│   └── Providers/
+│       ├── AppServiceProvider.php
+│       └── TelescopeServiceProvider.php
+│
+├── bootstrap/
+├── config/
+│   ├── telescope.php
+│   └── ...
+│
+├── database/
+│   ├── migrations/
+│   └── seeders/
+│
+├── public/
+├── resources/
+│   └── views/            # Email templates only
+├── routes/
+├── storage/
+├── tests/
+│
+├── composer.json
+└── README.md
+```
+
+---
+
+## <img src="https://api.iconify.design/lucide:terminal.svg?color=%238A2BE2" width="24" align="top" /> Quick Start
+
+### Prerequisites
+
+- PHP 8.5.8 (ZTS — Thread-Safe)
+- Composer 2.x
+- Redis Server 7+ (required for caching)
+- SQLite (preview with [VS Code SQLite Viewer](https://marketplace.visualstudio.com/items?itemName=qwtel.sqlite-viewer))
+
+### Installation
+
+```bash
+git clone https://github.com/AhmedTyson/t4-3dos-backend-task9.git
+cd t4-3dos-backend-task9
+
+# Full setup (recommended)
+composer run setup
+```
+
+Or step by step:
+
+```bash
+composer install
+copy .env.example .env
+php artisan key:generate
+php artisan jwt:secret
+php artisan migrate
+```
+
+### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `composer run setup` | Full project setup (install, env, key, jwt, migrate) |
+| `composer run dev` | Start Laravel dev server |
+| `composer run test` | Clear config & run tests |
+
+### Redis Caching
+
+Update `.env`:
+
+```env
+CACHE_STORE=redis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+```
+
+## <img src="https://api.iconify.design/lucide:route.svg?color=%238A2BE2" width="24" align="top" /> Development Roadmap
+
+| Phase | Focus | Description |
+|-------|-------|-------------|
+| 1 | Authentication | Registration, Login, Logout, JWT |
+| 2 | Password Management | Forgot Password, Reset Password |
+| 3 | RBAC | Roles, Permissions, Gates, Policies |
+| 4 | Core Modules | CRUD modules (min 4) |
+| 5 | Pagination | Paginated endpoints with metadata |
+| 6 | Caching | Cache queries, responses, routes |
+| 7 | Validation | Form Requests, validation rules |
+| 8 | API Documentation | Scramble annotations |
+| 9 | Testing | Feature & Unit tests |
+| 10 | Polish & Deploy | Review, optimize, deploy |
+
+---
+
+## <img src="https://api.iconify.design/lucide:users.svg?color=%238A2BE2" width="24" align="top" /> Team 4
+
+| Name | Role |
+|------|------|
+| Ahmed Elsayed (Ahmed Tyson) | Team Leader |
+| Mohamed Osama | Co-Leader |
+| Remas Ayman | Team Member |
+| Sarah Mahmoud | Team Member |
+| Fady Osama | Team Member |
+| Youssef Hany | Team Member |
+| Rana Medhat | Team Member |
+| Sama Refaat | Team Member |
+
+---
+
+## <img src="https://api.iconify.design/lucide:building-2.svg?color=%238A2BE2" width="24" align="top" /> About ThreeDOS
+
+ThreeDOS is a student-run initiative that replicates the structure and expectations of a professional software company. Members are assigned to functional departments (backend, frontend, design, product) and deliver real work under real constraints. The goal is to close the gap between academic learning and industry readiness.
+
+> Organization: [github.com/Threedos](https://github.com/Threedos)
+
+---
+
+## <img src="https://api.iconify.design/lucide:user.svg?color=%238A2BE2" width="24" align="top" /> Author
+
+**Ahmed Elsayed**
+Team Leader — Backend Development @ ThreeDOS
+[github.com/AhmedTyson](https://github.com/AhmedTyson)
