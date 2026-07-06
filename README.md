@@ -2,16 +2,14 @@
 
 ![Status](https://img.shields.io/badge/status-active-10b981?style=flat-square)
 ![Role](https://img.shields.io/badge/role-Backend_Team-8A2BE2?style=flat-square)
-![Stack](https://img.shields.io/badge/stack-Laravel_13-FF2D20?style=flat-square)
+![Stack](https://img.shields.io/badge/stack-Laravel_12-FF2D20?style=flat-square)
 ![Session](https://img.shields.io/badge/session-Task_9-4F5B93?style=flat-square)
 
 <br />
-Action required:
 
-RESTful API for [**project name — TBD**] built by **Team 4 Backend**. Delivers authenticated endpoints with JWT, role-based authorization (Admin/User), paginated collections, Redis caching, validated requests, and interactive API docs via Scramble. Frontend team consumes JSON responses at `/api/*` — full endpoint reference available at `/docs/api` after setup.
+RESTful API for **Tech Accessories E-commerce** built by **Team 4 Backend**. Delivers authenticated endpoints with JWT, role-based authorization (Admin/Customer), paginated collections, Redis caching, validated requests, and interactive API docs via Scramble. Frontend team consumes JSON responses at `/api/*`.
 
 ---
-
 
 ## <img src="https://api.iconify.design/lucide:list-checks.svg?color=%238A2BE2" width="24" align="top" /> Backend Requirements
 
@@ -59,13 +57,17 @@ Example response metadata:
 }
 ```
 
-### 4. Caching
+### 4. CRUD Modules
 
-The backend must utilize caching to improve application performance and reduce database load.
+The system must implement CRUD operations for at least four modules.
 
-### 5. API Validation
+### 5. Caching
 
-All incoming requests must be validated before processing.
+The system must leverage caching mechanisms to improve performance. Requirements include:
+
+- Caching of frequent database queries
+- Cache invalidation on data updates
+- Usage of Redis as the caching driver
 
 ### 6. API Documentation
 
@@ -78,13 +80,13 @@ The project must provide interactive API documentation.
 | Layer | Technology |
 |-------|-----------|
 | Language | PHP 8.5.8 (ZTS) |
-| Framework | Laravel 13 |
+| Framework | Laravel 12 |
 | Database | SQLite |
-| Monitoring | Laravel Telescope 5 |
+| Monitoring | Laravel Telescope |
 | API Documentation | Dedoc Scramble |
 | Authentication | JWT (tymon/jwt-auth) |
 | Caching | Redis (predis/predis) |
-| Testing | PHPUnit 12 / Pest |
+| Testing | PHPUnit / Pest |
 
 ---
 
@@ -94,25 +96,17 @@ The project must provide interactive API documentation.
 t4-3dos-backend-task9/
 │
 ├── app/
-│   ├── Http/
-│   │   └── Controllers/
+│   ├── Enums/
+│   ├── Http/Controllers/
 │   ├── Models/
 │   └── Providers/
-│       ├── AppServiceProvider.php
-│       └── TelescopeServiceProvider.php
 │
-├── bootstrap/
 ├── config/
-│   ├── telescope.php
-│   └── ...
-│
 ├── database/
+│   ├── factories/
 │   ├── migrations/
 │   └── seeders/
 │
-├── public/
-├── resources/
-│   └── views/            # Email templates only
 ├── routes/
 ├── storage/
 ├── tests/
@@ -127,10 +121,10 @@ t4-3dos-backend-task9/
 
 ### Prerequisites
 
-- PHP 8.5.8 (ZTS — Thread-Safe)
+- PHP 8.5.8 (ZTS)
 - Composer 2.x
-- Redis Server 7+ (required for caching)
-- SQLite (preview with [VS Code SQLite Viewer](https://marketplace.visualstudio.com/items?itemName=qwtel.sqlite-viewer))
+- Redis Server 7+
+- SQLite
 
 ### Installation
 
@@ -138,25 +132,17 @@ t4-3dos-backend-task9/
 git clone https://github.com/AhmedTyson/t4-3dos-backend-task9.git
 cd t4-3dos-backend-task9
 
-# Full setup (recommended)
-composer run setup
-```
-
-Or step by step:
-
-```bash
 composer install
 copy .env.example .env
 php artisan key:generate
 php artisan jwt:secret
-php artisan migrate
+php artisan migrate --seed
 ```
 
 ### Available Commands
 
 | Command | Description |
 |---------|-------------|
-| `composer run setup` | Full project setup (install, env, key, jwt, migrate) |
 | `composer run dev` | Start Laravel dev server |
 | `composer run test` | Clear config & run tests |
 
@@ -171,20 +157,22 @@ REDIS_PASSWORD=null
 REDIS_PORT=6379
 ```
 
+---
+
 ## <img src="https://api.iconify.design/lucide:route.svg?color=%238A2BE2" width="24" align="top" /> Development Roadmap
 
-| Phase | Focus | Description |
-|-------|-------|-------------|
-| 1 | Authentication | Registration, Login, Logout, JWT |
-| 2 | Password Management | Forgot Password, Reset Password |
-| 3 | RBAC | Roles, Permissions, Gates, Policies |
-| 4 | Core Modules | CRUD modules (min 4) |
-| 5 | Pagination | Paginated endpoints with metadata |
-| 6 | Caching | Cache queries, responses, routes |
-| 7 | Validation | Form Requests, validation rules |
-| 8 | API Documentation | Scramble annotations |
-| 9 | Testing | Feature & Unit tests |
-| 10 | Polish & Deploy | Review, optimize, deploy |
+| Phase | Status | Description |
+|-------|--------|-------------|
+| 1 | Completed | Project setup, migrations, seeders, models |
+| 2 | Completed | Auth guard (JWT), enums, review fixes |
+| 3 | Upcoming | AuthController (register, login, logout, me, refresh) |
+| 4 | Upcoming | ProductController (CRUD, pagination, filtration) |
+| 5 | Upcoming | CartController (show, add, update, remove) |
+| 6 | Upcoming | OrderController (place, list, show) |
+| 7 | Upcoming | AdminController (manage users, products, orders) |
+| 8 | Upcoming | Form request validation, policies |
+| 9 | Upcoming | Redis caching layer |
+| 10 | Upcoming | API docs (Scramble), tests |
 
 ---
 
@@ -214,5 +202,5 @@ ThreeDOS is a student-run initiative that replicates the structure and expectati
 ## <img src="https://api.iconify.design/lucide:user.svg?color=%238A2BE2" width="24" align="top" /> Author
 
 **Ahmed Elsayed**
-Team Leader — Backend Development @ ThreeDOS
+Team Leader — Backend Delegate @ ThreeDOS
 [github.com/AhmedTyson](https://github.com/AhmedTyson)
