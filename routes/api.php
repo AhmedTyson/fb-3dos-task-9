@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminOrderController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Route;
 
 // ==========================================
@@ -13,6 +14,16 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+});
+
+// ==========================================
+// Remas' Scope: Cart Module
+// ==========================================
+Route::middleware('auth:api')->group(function () {
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/cart/items', [CartController::class, 'store']);
+    Route::put('/cart/items/{id}', [CartController::class, 'update']);
+    Route::delete('/cart/items/{id}', [CartController::class, 'destroy']);
 });
 
 // ==========================================
