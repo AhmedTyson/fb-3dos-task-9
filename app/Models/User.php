@@ -13,6 +13,7 @@ class User extends Authenticatable implements JWTSubject
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    protected $table = 'users';
     protected $fillable = [
         'name',
         'email',
@@ -29,6 +30,7 @@ class User extends Authenticatable implements JWTSubject
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'role' => UserRole::class,
         ];
     }
 
@@ -39,7 +41,7 @@ class User extends Authenticatable implements JWTSubject
 
     public function getJWTCustomClaims(): array
     {
-        return [];
+        return ['role' => $this->role ? $this->role->value : 'customer',];
     }
 
     public function cart(): \Illuminate\Database\Eloquent\Relations\HasOne
