@@ -16,10 +16,13 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth()->userOrFail();
+        $user = $request->user();
 
-        if ($user->role !== UserRole::Admin) {
-            return response()->json(['message' => 'Forbidden. Admin access required.'], 403);
+        if (!$user || $user->role !== UserRole::Admin) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Access denied',
+            ], 403);
         }
 
         return $next($request);

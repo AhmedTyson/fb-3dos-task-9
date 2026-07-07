@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,7 @@ class Order extends Model
     protected $casts = [
         'shipping_address' => 'array',
         'total' => 'float',
+        'status' => OrderStatus::class,
     ];
 
     public function user(): BelongsTo
@@ -32,5 +34,31 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    /**
+     * Check if the order can transition to the given status.
+     */
+    public function canTransitionTo(OrderStatus $newStatus): bool
+    {
+        $current = $this->status;
+
+        if ($current === $newStatus) {
+            return true;
+        }
+
+        if ($current === OrderStatus::Pending) {
+            return in_array($newStatus, [OrderStatus::Approved, OrderStatus::Cancelled]);
+        }
+
+        if ($current === OrderStatus::Approved) {
+            return in_array($newStatus, [OrderStatus::Shipped, OrderStatus::Cancelled]);
+        }
+
+        if ($current === OrderStatus::Shipped) {
+            return $newStatus === OrderStatus::Completed;
+        }
+
+        return false;
     }
 }

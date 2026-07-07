@@ -3,36 +3,52 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
-use App\Http\Requests\AuthRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
-    public function register(AuthRequest $request){
+    public function register(Request $request)
+    {
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
         try {
-            $validated = $request->validated();
             $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => $validated['password'],
-                'role' => UserRole::Customer,
+                'name'     => $validated['name'],
+                'email'    => $validated['email'],
+                'password' => Hash::make($validated['password']),
+                'role'     => UserRole::Customer,
             ]);
-            $token = auth('api')->login($user);
+            $token = JWTAuth::fromUser($user);
         } catch (Exception $ex) {
-            return response()->json(["exception" => $ex->getMessage()]);
+            return response()->json([
+                'message'   => 'Registration failed',
+                'exception' => $ex->getMessage()
+            ], 500);
         }
+        
         return response()->json([
-            'message' => "user created",
-            'token' => $token
+            'message' => 'User created successfully',
+            'token'   => $token
         ], 201);
     }
 
-    public function login(AuthRequest $request)
+    public function login(Request $request)
     {
-        $credentials = $request->validated();
-        $token = auth('api')->attempt($credentials);
+        $credentials = $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $token = JWTAuth::attempt($credentials);
 
         if (!$token) {
             return response()->json([
@@ -41,27 +57,25 @@ class AuthController extends Controller
         }
 
         return response()->json([
-            'message' => 'user logged in successfully',
+            'message' => 'User logged in successfully',
             'token'   => $token,
-        ]);
+        ], 200);
     }
 
-    public function me()
+    public function me(Request $request)
     {
-        $user = auth('api')->user();
-
         return response()->json([
-            'success' => true,
-            'user'    => $user,
-        ]);
+            'message' => 'User profile fetched successfully',
+            'user'    => $request->user(),
+        ], 200);
     }
 
     public function logout()
     {
-        auth('api')->logout();
+        Auth::logout();
 
         return response()->json([
-            'message' => 'User Logged out Successfully',
-        ]);
+            'message' => 'User logged out successfully',
+        ], 200);
     }
 }
