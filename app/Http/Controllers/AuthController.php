@@ -3,19 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
+use App\Http\Requests\AuthRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function register(Request $request){
+    public function register(AuthRequest $request){
         try {
             $validated = $request->validated();
             $user = User::create([
-                'name' => $validated->name,
-                'email' => $validated->email,
-                'password' => $validated->password,
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'],
                 'role' => UserRole::Customer,
             ]);
             $token = auth('api')->login($user);
@@ -28,7 +29,7 @@ class AuthController extends Controller
         ], 201);
     }
 
-    public function login(Request $request)
+    public function login(AuthRequest $request)
     {
         $credentials = $request->validated();
         $token = auth('api')->attempt($credentials);
