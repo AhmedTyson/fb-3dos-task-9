@@ -11,15 +11,11 @@ class AuthController extends Controller
 {
     public function register(Request $request){
         try {
-            $validated = $request->validate([
-                "name" => 'required|string|max:50',
-                "email" => 'required|email|unique:users,email',
-                "password" => 'required|string|min:8'
-            ]);
+            $validated = $request->validated();
             $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => $request->password,
+                'name' => $validated->name,
+                'email' => $validated->email,
+                'password' => $validated->password,
                 'role' => UserRole::Customer,
             ]);
             $token = auth('api')->login($user);
@@ -34,7 +30,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        $credentials = $request->validated();
         $token = auth('api')->attempt($credentials);
 
         if (!$token) {
