@@ -20,8 +20,8 @@ class IsAdmin
 
         if (!$user || $user->role !== UserRole::Admin) {
             return response()->json([
-                'success' => false,
                 'message' => 'Access denied',
+                'data'    => null,
             ], 403);
         }
 

@@ -7,9 +7,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class OrderService
 {
-    /**
-     * Get paginated and filtered orders for admin.
-     */
     public function getAdminOrders(array $filters, int $perPage): LengthAwarePaginator
     {
         $query = Order::with('user:id,name');
@@ -37,4 +34,3 @@ class OrderService
         return $query->latest()->paginate($perPage);
     }
 }
-

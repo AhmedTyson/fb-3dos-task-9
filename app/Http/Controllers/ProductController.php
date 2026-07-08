@@ -2,65 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateProductRequest;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
-    public function update(Request $request, $id)
+    public function update(UpdateProductRequest $request, Product $product): JsonResponse
     {
-        if (!auth()->check()) {
-            return response()->json([
-                'message' => 'Unauthenticated'
-            ], 401);
-        }
+        Gate::authorize('update', $product);
 
-        if (auth()->user()->role !== 'admin') {
-            return response()->json([
-                'message' => 'Unauthorized'
-            ], 403);
-        }
-
-        $product = Product::findOrFail($id);
-
-        $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
-            'size' => 'required|string|max:50',
-            'base_price' => 'required|numeric',
-            'in_stock' => 'required|boolean',
-            'images' => 'nullable|array',
-        ]);
-
-        $product->update($validated);
+        $product->update($request->validated());
 
         return response()->json([
             'message' => 'Product updated successfully',
-            'product' => $product
+            'data'    => new ProductResource($product),
         ]);
     }
 
-    public function destroy($id)
+    public function destroy(Product $product): JsonResponse
     {
-        if (!auth()->check()) {
-            return response()->json([
-                'message' => 'Unauthenticated'
-            ], 401);
-        }
-
-        if (auth()->user()->role !== 'admin') {
-            return response()->json([
-                'message' => 'Unauthorized'
-            ], 403);
-        }
-
-        $product = Product::findOrFail($id);
+        Gate::authorize('delete', $product);
 
         $product->delete();
 
         return response()->json([
-            'message' => 'Product deleted successfully'
+            'message' => 'Product deleted successfully',
+            'data'    => null,
         ]);
     }
 }

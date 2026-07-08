@@ -22,8 +22,14 @@ class Order extends Model
 
     protected $casts = [
         'shipping_address' => 'array',
-        'total' => 'float',
-        'status' => OrderStatus::class,
+        'total'            => 'float',
+        'status'           => OrderStatus::class,
+    ];
+
+    protected const TRANSITIONS = [
+        OrderStatus::Pending->value  => [OrderStatus::Approved,  OrderStatus::Cancelled],
+        OrderStatus::Approved->value => [OrderStatus::Shipped,   OrderStatus::Cancelled],
+        OrderStatus::Shipped->value  => [OrderStatus::Completed],
     ];
 
     public function user(): BelongsTo
@@ -36,29 +42,14 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    /**
-     * Check if the order can transition to the given status.
-     */
     public function canTransitionTo(OrderStatus $newStatus): bool
     {
-        $current = $this->status;
-
-        if ($current === $newStatus) {
-            return true;
+        if ($this->status === $newStatus) {
+            return false;
         }
 
-        if ($current === OrderStatus::Pending) {
-            return in_array($newStatus, [OrderStatus::Approved, OrderStatus::Cancelled]);
-        }
+        $allowed = static::TRANSITIONS[$this->status->value] ?? [];
 
-        if ($current === OrderStatus::Approved) {
-            return in_array($newStatus, [OrderStatus::Shipped, OrderStatus::Cancelled]);
-        }
-
-        if ($current === OrderStatus::Shipped) {
-            return $newStatus === OrderStatus::Completed;
-        }
-
-        return false;
+        return in_array($newStatus, $allowed, strict: true);
     }
 }

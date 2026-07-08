@@ -12,65 +12,60 @@ use OpenSpout\Writer\XLSX\Options;
 
 class XlsxService
 {
-    /**
-     * Build a sales-report XLSX and return the file path (temp).
-     */
+    private const COL_WIDTH_ID       = 10;
+    private const COL_WIDTH_CUSTOMER = 30;
+    private const COL_WIDTH_STATUS   = 15;
+    private const COL_WIDTH_TOTAL    = 18;
+    private const COL_WIDTH_DATE     = 25;
+
     public function salesReport(array $report): string
     {
-        $path = tempnam(sys_get_temp_dir(), 'sales_report_') . '.xlsx';
+        $path   = tempnam(sys_get_temp_dir(), 'sales_report_') . '.xlsx';
+        $writer = new Writer($this->buildOptions());
+        $styles = $this->buildStyles();
 
-        $options = new Options();
-        // Set column widths for a professional look
-        $options->setColumnWidth(10, 1); // ID
-        $options->setColumnWidth(30, 2); // Customer
-        $options->setColumnWidth(15, 3); // Status
-        $options->setColumnWidth(18, 4); // Total
-        $options->setColumnWidth(25, 5); // Date
-
-        $writer = new Writer($options);
         $writer->openToFile($path);
+        $this->writeSummarySection($writer, $report, $styles);
+        $this->writeOrdersTable($writer, $report['orders'], $styles);
+        $writer->close();
 
-        // Styles
-        $titleStyle = (new Style())
-            ->withFontBold(true)
-            ->withFontSize(16)
-            ->withFontColor(Color::DARK_BLUE);
+        return $path;
+    }
 
-        $subtitleStyle = (new Style())
-            ->withFontBold(true)
-            ->withFontColor(Color::BLACK);
+    private function buildOptions(): Options
+    {
+        $options = new Options();
+        $options->setColumnWidth(self::COL_WIDTH_ID,       1);
+        $options->setColumnWidth(self::COL_WIDTH_CUSTOMER, 2);
+        $options->setColumnWidth(self::COL_WIDTH_STATUS,   3);
+        $options->setColumnWidth(self::COL_WIDTH_TOTAL,    4);
+        $options->setColumnWidth(self::COL_WIDTH_DATE,     5);
 
-        $headerStyle = (new Style())
-            ->withFontBold(true)
-            ->withFontColor(Color::WHITE)
-            ->withBackgroundColor(Color::DARK_BLUE)
-            ->withCellAlignment(CellAlignment::CENTER);
+        return $options;
+    }
 
-        $rowStyle = (new Style())
-            ->withFontSize(11)
-            ->withCellAlignment(CellAlignment::LEFT);
+    private function buildStyles(): array
+    {
+        $base = (new Style())->withFontSize(11)->withCellAlignment(CellAlignment::LEFT);
 
-        $moneyStyle = clone $rowStyle;
-        $moneyStyle = $moneyStyle->withFormat('#,##0.00')->withCellAlignment(CellAlignment::RIGHT);
+        return [
+            'title'  => (new Style())->withFontBold(true)->withFontSize(16)->withFontColor(Color::DARK_BLUE),
+            'header' => (new Style())->withFontBold(true)->withFontColor(Color::WHITE)
+                            ->withBackgroundColor(Color::DARK_BLUE)->withCellAlignment(CellAlignment::CENTER),
+            'row'    => $base,
+            'money'  => (clone $base)->withFormat('#,##0.00')->withCellAlignment(CellAlignment::RIGHT),
+            'center' => (clone $base)->withCellAlignment(CellAlignment::CENTER),
+        ];
+    }
 
-        $dateStyle = clone $rowStyle;
-        $dateStyle = $dateStyle->withCellAlignment(CellAlignment::CENTER);
-
-        $centerStyle = clone $rowStyle;
-        $centerStyle = $centerStyle->withCellAlignment(CellAlignment::CENTER);
-
-        // Summary Section
-        $titleRow = Row::fromValuesWithStyle(['Tech Accessories - Sales Report'], $titleStyle);
-        $writer->addRow($titleRow);
-
+    private function writeSummarySection(Writer $writer, array $report, array $styles): void
+    {
+        $writer->addRow(Row::fromValuesWithStyle(['Tech Accessories - Sales Report'], $styles['title']));
         $writer->addRow(Row::fromValues([]));
-        
         $writer->addRow(Row::fromValues(['Period From:', $report['period']['from'] ?? 'All time']));
         $writer->addRow(Row::fromValues(['Period To:',   $report['period']['to']   ?? 'All time']));
-        $writer->addRow(Row::fromValues(['Total Orders:',  $report['total_orders']]));
-
-        $revenueRow = Row::fromValuesWithStyle(['Total Revenue:', $report['total_revenue']], $moneyStyle);
-        $writer->addRow($revenueRow);
+        $writer->addRow(Row::fromValues(['Total Orders:', $report['total_orders']]));
+        $writer->addRow(Row::fromValuesWithStyle(['Total Revenue:', $report['total_revenue']], $styles['money']));
 
         if ($report['top_product']) {
             $tp = $report['top_product'];
@@ -79,24 +74,23 @@ class XlsxService
 
         $writer->addRow(Row::fromValues([]));
         $writer->addRow(Row::fromValues([]));
+    }
 
-        // Orders Table Header
-        $headerRow = Row::fromValuesWithStyle(['Order ID', 'Customer Name', 'Status', 'Total (EGP)', 'Date'], $headerStyle);
-        $writer->addRow($headerRow);
+    private function writeOrdersTable(Writer $writer, iterable $orders, array $styles): void
+    {
+        $writer->addRow(Row::fromValuesWithStyle(
+            ['Order ID', 'Customer Name', 'Status', 'Total (EGP)', 'Date'],
+            $styles['header']
+        ));
 
-        foreach ($report['orders'] as $order) {
-            $idCell       = Cell::fromValue($order['id'])->withStyle($centerStyle);
-            $customerCell = Cell::fromValue($order['customer_name']);
-            $statusCell   = Cell::fromValue($order['status'])->withStyle($centerStyle);
-            $totalCell    = Cell::fromValue($order['total'])->withStyle($moneyStyle);
-            $dateCell     = Cell::fromValue($order['created_at'])->withStyle($dateStyle);
-
-            $writer->addRow(new Row([$idCell, $customerCell, $statusCell, $totalCell, $dateCell]));
+        foreach ($orders as $order) {
+            $writer->addRow(new Row([
+                Cell::fromValue($order['id'])->withStyle($styles['center']),
+                Cell::fromValue($order['customer_name']),
+                Cell::fromValue($order['status'])->withStyle($styles['center']),
+                Cell::fromValue($order['total'])->withStyle($styles['money']),
+                Cell::fromValue($order['created_at'])->withStyle($styles['center']),
+            ]));
         }
-
-        $writer->close();
-
-        return $path;
     }
 }
-

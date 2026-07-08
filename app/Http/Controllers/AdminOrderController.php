@@ -27,9 +27,6 @@ class AdminOrderController extends Controller
         private readonly XlsxService        $xlsxService,
     ) {}
 
-    // -------------------------------------------------------------------------
-    // GET /admin/orders
-    // -------------------------------------------------------------------------
     public function index(AdminOrderIndexRequest $request): JsonResponse
     {
         $orders = $this->orderService->getAdminOrders(
@@ -38,60 +35,45 @@ class AdminOrderController extends Controller
         );
 
         return response()->json([
-            'success' => true,
             'message' => 'Orders fetched',
-            'data'    => new AdminOrderCollection($orders)
+            'data'    => new AdminOrderCollection($orders),
         ]);
     }
 
-    // -------------------------------------------------------------------------
-    // PUT /admin/orders/{order}/status
-    // -------------------------------------------------------------------------
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order): JsonResponse
     {
         $order->update(['status' => $request->validated('status')]);
 
         return response()->json([
-            'success' => true,
             'message' => 'Order status updated',
-            'data'    => new OrderStatusResource($order)
+            'data'    => new OrderStatusResource($order),
         ]);
     }
 
-    // -------------------------------------------------------------------------
-    // GET /admin/orders/{order}/print-file?format=pdf (default)
-    // -------------------------------------------------------------------------
     public function printFile(PrintFileRequest $request, Order $order): Response
     {
         return $this->pdfService->orderPrint($order);
     }
 
-    // -------------------------------------------------------------------------
-    // GET /admin/reports/sales?format=json|xlsx|pdf&from=...&to=...
-    // -------------------------------------------------------------------------
-    public function salesReport(SalesReportRequest $request): mixed
+    public function salesReport(SalesReportRequest $request): Response
     {
         $format = strtolower($request->query('format', 'json'));
-        
+
         $report = $this->salesReportService->generate(
-            $request->from ?? null,
-            $request->to   ?? null,
+            $request->validated('from'),
+            $request->validated('to'),
         );
 
         return match ($format) {
             'xlsx'  => $this->xlsxDownload($report),
             'pdf'   => $this->pdfService->salesReport($report),
             default => response()->json([
-                'success' => true,
                 'message' => 'Sales report generated',
-                'data'    => new SalesReportResource($report)
+                'data'    => new SalesReportResource($report),
             ]),
         };
     }
 
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
     private function xlsxDownload(array $report): BinaryFileResponse
     {
         $path = $this->xlsxService->salesReport($report);

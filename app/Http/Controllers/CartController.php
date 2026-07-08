@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCartItemRequest;
+use App\Http\Requests\UpdateCartItemRequest;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Resources\CartResource;
 use App\Http\Resources\CartItemResource;
+use Illuminate\Support\Facades\Gate;
 
 class CartController extends Controller
 {
-    /**
-     * Get the current user's cart contents.
-     */
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
         $cart = Cart::with('items.product')->where('user_id', $request->user()->id)->first();
-        
+
         if (!$cart) {
             return response()->json([
                 'message' => 'Cart is empty',
@@ -31,25 +32,15 @@ class CartController extends Controller
         ], 200);
     }
 
-    /**
-     * Add a product to the cart.
-     */
-    public function store(Request $request)
+    public function store(StoreCartItemRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity'   => 'required|integer|min:1'
-        ]);
+        $validated = $request->validated();
 
-        $cart = Cart::firstOrCreate([
-            'user_id' => $request->user()->id,
-        ]);
+        $cart = Cart::firstOrCreate(['user_id' => $request->user()->id]);
 
         $product = Product::findOrFail($validated['product_id']);
-        
-        $item = $cart->items()
-             ->where('product_id', $product->id)
-             ->first();
+
+        $item = $cart->items()->where('product_id', $product->id)->first();
 
         if ($item) {
             $item->quantity += $validated['quantity'];
@@ -62,7 +53,6 @@ class CartController extends Controller
             ]);
         }
 
-        // Load product relation to ensure CartItemResource can display it if needed
         $item->load('product');
 
         return response()->json([
@@ -71,24 +61,12 @@ class CartController extends Controller
         ], 201);
     }
 
-    /**
-     * Update quantity of a cart item.
-     */
-    public function update(Request $request, string $id)
+    public function update(UpdateCartItemRequest $request, CartItem $item): JsonResponse
     {
-        $validated = $request->validate([
-            'quantity' => 'required|integer|min:1',
-        ]);
+        $item->load('cart');
+        Gate::authorize('update', $item);
 
-        $item = CartItem::findOrFail($id);
-
-        if ($item->cart->user_id !== $request->user()->id) {
-            return response()->json([
-                "message" => 'Unauthorized',
-            ], 403);
-        }
-
-        $item->quantity = $validated['quantity'];
+        $item->quantity = $request->validated('quantity');
         $item->save();
 
         $item->load('product');
@@ -99,24 +77,16 @@ class CartController extends Controller
         ], 200);
     }
 
-    /**
-     * Remove an item from the cart.
-     */
-    public function destroy(Request $request, string $id)
+    public function destroy(CartItem $item): JsonResponse
     {
-        $item = CartItem::findOrFail($id);
-
-        if ($item->cart->user_id !== $request->user()->id) {
-            return response()->json([
-                'message' => 'Unauthorized'
-            ], 403);
-        }
+        $item->load('cart');
+        Gate::authorize('delete', $item);
 
         $item->delete();
 
         return response()->json([
-            'message' => 'Item removed successfully'
+            'message' => 'Item removed successfully',
+            'data'    => null,
         ], 200);
     }
 }
-
