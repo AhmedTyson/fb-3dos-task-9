@@ -11,13 +11,29 @@ use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::with('category')->paginate(10);
+        $products = Product::with('category')
+            ->when($request->query('category_id'), function ($query, $categoryId) {
+                $query->where('category_id', $categoryId);
+            })
+            ->when($request->query('search'), function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->query('min_price'), function ($query, $minPrice) {
+                $query->where('base_price', '>=', $minPrice);
+            })
+            ->when($request->query('max_price'), function ($query, $maxPrice) {
+                $query->where('base_price', '<=', $maxPrice);
+            })
+            ->paginate((int) $request->query('per_page', 10));
 
         return response()->json([
             'message' => 'Products fetched successfully',
-            'data'    => ProductResource::collection($products),
+            'data'    => ProductResource::collection($products)->response()->getData(true),
         ]);
     }
 
