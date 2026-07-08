@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\JsonExceptionResolver;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\CacheJsonResponse;
 use Illuminate\Foundation\Application;
@@ -34,6 +35,24 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*'),
         );
+
+        $exceptions->render(function (Throwable $e, Request $request) {
+            $status  = JsonExceptionResolver::statusCode($e);
+            $message = JsonExceptionResolver::message($e, $status);
+            $data    = JsonExceptionResolver::data($e, $status);
+
+            $payload = ['message' => $message, 'data' => $data];
+
+            if (config('app.debug') && $status >= 500) {
+                $payload['debug'] = [
+                    'file'  => $e->getFile() . ':' . $e->getLine(),
+                    'type'  => get_class($e),
+                    'trace' => collect($e->getTrace())->take(5)->toArray(),
+                ];
+            }
+
+            return response()->json($payload, $status);
+        });
     })
 
     ->create();

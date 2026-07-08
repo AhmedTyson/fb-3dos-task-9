@@ -16,13 +16,13 @@ class CartItemResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "product" =>[
-                'id' =>$this->product->id,
-                'name' =>$this->product->name,
-                'price' =>$this->product->price,
+            "product" => [
+                'id'    => $this->product->id,
+                'name'  => $this->product->name,
+                'price' => $this->product->base_price,
             ],
-            "quantity" =>$this->quantity,
-            "subtotal" => $this->quantity * $this->product->pice,
+            "quantity" => $this->quantity,
+            "subtotal" => $this->quantity * $this->product->base_price,
         ];
     }
 }

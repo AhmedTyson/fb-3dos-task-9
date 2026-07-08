@@ -19,7 +19,7 @@ class CartResource extends JsonResource
             "user_id"=> $this->user_id,
             "items" => CartItemResource::collection($this->items),
             "total" => $this->items->sum(function ($item) {
-                return $item->quantity * $item->product->price;
+                return $item->quantity * $item->product->base_price;
             }),
         ];
     }
