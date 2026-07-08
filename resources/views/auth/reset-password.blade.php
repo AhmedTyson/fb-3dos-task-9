@@ -8,6 +8,14 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+        .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .transition-colors-transform { transition: color 0.3s ease, transform 0.3s ease; }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -34,12 +42,12 @@
                     </button>
                 </div>
                 <!-- Validation Checklist -->
-                <ul id="password-reqs" class="text-xs text-gray-500 mt-3 space-y-1.5 transition-all">
-                    <li id="req-length" class="flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> At least 8 characters</li>
-                    <li id="req-upper" class="flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 uppercase letter</li>
-                    <li id="req-lower" class="flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 lowercase letter</li>
-                    <li id="req-number" class="flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 number</li>
-                    <li id="req-special" class="flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 special character</li>
+                <ul id="password-reqs" class="text-xs text-gray-500 mt-3 space-y-1.5">
+                    <li id="req-length" class="flex items-center transition-colors-transform"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg> At least 8 characters</li>
+                    <li id="req-upper" class="flex items-center transition-colors-transform"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg> 1 uppercase letter</li>
+                    <li id="req-lower" class="flex items-center transition-colors-transform"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg> 1 lowercase letter</li>
+                    <li id="req-number" class="flex items-center transition-colors-transform"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg> 1 number</li>
+                    <li id="req-special" class="flex items-center transition-colors-transform"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="currentColor"></circle></svg> 1 special character</li>
                 </ul>
             </div>
 
@@ -54,29 +62,26 @@
                         <svg id="password_confirmation-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                     </button>
                 </div>
-                <p id="match-error" class="hidden text-xs text-red-600 mt-1">Passwords do not match.</p>
+                <p id="match-error" class="hidden text-xs text-red-600 mt-1 transition-all">Passwords do not match.</p>
             </div>
 
             <button type="submit" id="submit-btn" disabled
-                class="w-full bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition-colors flex justify-center items-center mt-6">
+                class="w-full bg-gray-900 hover:bg-gray-800 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition-colors flex justify-center items-center mt-6">
                 <span>Update Password</span>
             </button>
         </form>
     </div>
 
     <script>
-        // Extract token and email from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
         const email = urlParams.get('email');
 
-        // Elements
         const passwordInput = document.getElementById('password');
         const confirmInput = document.getElementById('password_confirmation');
         const submitBtn = document.getElementById('submit-btn');
         const matchError = document.getElementById('match-error');
 
-        // Validation Elements
         const reqs = {
             length: document.getElementById('req-length'),
             upper: document.getElementById('req-upper'),
@@ -85,11 +90,11 @@
             special: document.getElementById('req-special')
         };
 
-        // Eye Icon SVG Paths
         const iconEye = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
         const iconEyeSlash = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>';
+        const iconCheck = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>';
+        const iconDot = '<circle cx="12" cy="12" r="3" fill="currentColor"></circle>';
 
-        // Show/Hide Password Toggle
         window.togglePassword = function(inputId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(inputId + '-eye');
@@ -102,7 +107,6 @@
             }
         };
 
-        // Real-time Password Validation
         function validatePassword() {
             const pw = passwordInput.value;
             const conf = confirmInput.value;
@@ -115,16 +119,23 @@
                 special: /[^A-Za-z0-9]/.test(pw)
             };
 
-            // Update UI checklist colors
             for (const [key, isValid] of Object.entries(rules)) {
-                if (isValid) {
-                    reqs[key].classList.replace('text-gray-500', 'text-green-600');
-                } else {
-                    reqs[key].classList.replace('text-green-600', 'text-gray-500');
+                const li = reqs[key];
+                const svg = li.querySelector('svg');
+                
+                if (isValid && !li.dataset.valid) {
+                    li.classList.replace('text-gray-500', 'text-green-600');
+                    svg.innerHTML = iconCheck;
+                    svg.classList.add('animate-pop');
+                    li.dataset.valid = 'true';
+                } else if (!isValid && li.dataset.valid) {
+                    li.classList.replace('text-green-600', 'text-gray-500');
+                    svg.innerHTML = iconDot;
+                    svg.classList.remove('animate-pop');
+                    delete li.dataset.valid;
                 }
             }
 
-            // Check Passwords Match
             const isMatch = pw === conf && conf.length > 0;
             if (conf.length > 0 && !isMatch) {
                 matchError.classList.remove('hidden');
@@ -134,7 +145,6 @@
                 confirmInput.classList.remove('border-red-500', 'focus:ring-red-500');
             }
 
-            // Enable/Disable Button
             const allRulesMet = Object.values(rules).every(Boolean);
             submitBtn.disabled = !(allRulesMet && isMatch);
         }
@@ -142,12 +152,11 @@
         passwordInput.addEventListener('input', validatePassword);
         confirmInput.addEventListener('input', validatePassword);
 
-        // Form Submit
         document.getElementById('reset-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const alertBox = document.getElementById('alert-box');
             
-            if (submitBtn.disabled) return; // Prevent submission if JS validation fails
+            if (submitBtn.disabled) return;
 
             if (!token || !email) {
                 alertBox.className = 'mb-6 p-4 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200';
@@ -163,16 +172,8 @@
             try {
                 const response = await fetch('/api/reset-password', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        email, 
-                        token, 
-                        password: passwordInput.value,
-                        password_confirmation: confirmInput.value
-                    })
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ email, token, password: passwordInput.value, password_confirmation: confirmInput.value })
                 });
 
                 const data = await response.json();
@@ -180,7 +181,7 @@
                 if (response.ok || response.status === 200) {
                     document.getElementById('reset-form').classList.add('hidden');
                     alertBox.className = 'mb-6 p-4 rounded-lg text-sm bg-green-50 text-green-800 border border-green-200 text-center';
-                    alertBox.innerHTML = '<svg class="w-8 h-8 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <p class="font-medium text-green-900 mb-1">Password Reset Successful</p><p class="text-green-700">You can now use your new password to log in.</p><a href="#" class="mt-4 inline-block text-blue-600 font-medium hover:underline">Go to Login</a>';
+                    alertBox.innerHTML = '<svg class="w-8 h-8 text-green-500 mx-auto mb-2 animate-pop" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> <p class="font-medium text-green-900 mb-1">Password Reset Successful</p><p class="text-green-700">You can now use your new password to log in.</p><a href="#" class="mt-4 inline-block text-blue-600 font-medium hover:underline">Go to Login</a>';
                     alertBox.classList.remove('hidden');
                 } else {
                     throw new Error(data.message || 'The token has expired or is invalid.');
@@ -188,7 +189,6 @@
             } catch (err) {
                 let msg = err.message;
                 if (msg === 'passwords.token') msg = 'This password reset token is invalid or has expired.';
-                
                 alertBox.className = 'mb-6 p-4 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200';
                 alertBox.textContent = msg;
                 alertBox.classList.remove('hidden');
