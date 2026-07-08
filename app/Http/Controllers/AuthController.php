@@ -12,6 +12,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {

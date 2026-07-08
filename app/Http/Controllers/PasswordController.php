@@ -9,49 +9,46 @@ use App\Models\User;
 
 class PasswordController extends Controller
 {
-    public function forgotPassword(Request $request)
-    {
+    
+
+    /**
+     * 1. endpoint forgetpassword email (send reset link)
+     * 2. reset password change -> change password
+     */
+
+
+    public function forgetPassword(Request $request){
         $request->validate([
-            'email' => 'required|email'
+            'email' => ['required', 'email', 'exists:users,email'],
         ]);
-
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
-        return response()->json([
-            'status' => $status
-        ]);
+        // generate rest link, send via email
+        $status= Password::sendResetLink($request->only('email'));
+        if($status==Password::RESET_LINK_SENT){
+            return response()->json(["message"=>$status]);
+        }
+        return response()->json(["message"=>$status],422);
     }
 
-    public function resetPassword(Request $request)
-    {
+
+    public function resetPassword(Request $request){
         $request->validate([
-            'token'=>'required',
-            'email'=>'required|email',
-            'password'=>'required|min:8|confirmed'
+            "email"=>["required", "email", "exists:users,email"],
+            "password"=>["required", "confirmed", "min:8"],
+            "token"=>["required"]
         ]);
+        // 2. change user password
+        $status = Password::reset($request->only("email", "password", "token"), 
+        function(User $user, string $password){
+            $user->update([
+                "password" => Hash::make($password),
+            ]);
+        });
 
-        $status = Password::reset(
-            $request->only(
-                'email',
-                'password',
-                'password_confirmation',
-                'token'
-            ),
-
-            function (User $user, string $password) {
-
-                $user->forceFill([
-                    'password'=>Hash::make($password),
-                    'remember_token'=>Str::random(60),
-                ])->save();
-
-            }
-        );
-
+        // 3. return response
         return response()->json([
-            'status'=>$status
+            "message"=> $status == Password::PASSWORD_RESET
+                ? 200
+                : 422
         ]);
     }
 }

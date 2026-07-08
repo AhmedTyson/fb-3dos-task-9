@@ -33,5 +33,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('IsUser', function (User $user) {
             return $user->role->value == "customer";
         });
+
+        ResetPassword::createUrlUsing(function($user, string $token){
+            return config("app.frontend_url")."/reset-password?token=".$token.'&email='.urlencode($user->email);
+        });
     }
 }
