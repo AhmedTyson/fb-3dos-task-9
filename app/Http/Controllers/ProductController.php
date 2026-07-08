@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -11,47 +13,25 @@ use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): JsonResponse
     {
+        $limit = min((int) $request->query('per_page', 10), 100);
+
         $products = Product::with('category')
-            ->when($request->query('category_id'), function ($query, $categoryId) {
-                $query->where('category_id', $categoryId);
-            })
-            ->when($request->query('search'), function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('description', 'like', "%{$search}%");
-                });
-            })
-            ->when($request->query('min_price'), function ($query, $minPrice) {
-                $query->where('base_price', '>=', $minPrice);
-            })
-            ->when($request->query('max_price'), function ($query, $maxPrice) {
-                $query->where('base_price', '<=', $maxPrice);
-            })
-            ->paginate((int) $request->query('per_page', 10));
+            ->filter($request->only(['category_id', 'search', 'min_price', 'max_price']))
+            ->paginate($limit);
 
         return response()->json([
             'message' => 'Products fetched successfully',
-            'data'    => ProductResource::collection($products)->response()->getData(true),
+            'data'    => new ProductCollection($products),
         ]);
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(StoreProductRequest $request): JsonResponse
     {
         Gate::authorize('create', Product::class);
 
-        $validated = $request->validate([
-            'category_id' => 'required|integer|exists:categories,id',
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'size'        => 'required|string|max:50',
-            'base_price'  => 'required|numeric|min:0',
-            'in_stock'    => 'required|boolean',
-            'images'      => 'nullable|array',
-        ]);
-
-        $product = Product::create($validated);
+        $product = Product::create($request->validated());
         $product->load('category');
 
         return response()->json([

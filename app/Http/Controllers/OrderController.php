@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreOrderRequest;
+use App\Http\Resources\UserOrderCollection;
 use App\Http\Resources\UserOrderResource;
 use App\Models\Order;
 use App\Services\OrderService;
@@ -18,14 +19,16 @@ class OrderController extends Controller
 
     public function index(Request $request): JsonResponse
     {
+        $limit = min((int) $request->query('per_page', 10), 100);
+
         $orders = $this->orderService->getUserOrders(
             $request->user(),
-            (int) $request->query('per_page', 10)
+            $limit
         );
 
         return response()->json([
             'message' => 'Orders fetched successfully',
-            'data'    => UserOrderResource::collection($orders)->response()->getData(true),
+            'data'    => new UserOrderCollection($orders),
         ]);
     }
 

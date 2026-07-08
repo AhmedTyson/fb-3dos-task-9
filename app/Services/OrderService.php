@@ -14,7 +14,8 @@ class OrderService
 {
     public function checkout(User $user, array $shippingAddress, string $paymentMethod): Order
     {
-        $cart = Cart::with('items.product')->firstOrCreate(['user_id' => $user->id]);
+        $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+        $cart->load('items.product');
 
         if ($cart->items->isEmpty()) {
             throw new UnprocessableEntityHttpException('Cart is empty');
@@ -34,7 +35,7 @@ class OrderService
                 'payment_method'   => $paymentMethod,
             ]);
 
-            $orderItems = $cart->items->map(function ($item) {
+            $orderItems = $cart->items->filter(fn($item) => $item->product)->map(function ($item) {
                 return [
                     'product_id' => $item->product_id,
                     'quantity'   => $item->quantity,
