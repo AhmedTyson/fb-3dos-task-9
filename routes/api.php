@@ -10,9 +10,9 @@ use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register'])->name('register');
-Route::post('/login',    [AuthController::class, 'login'])->name('login');
-Route::post('/forgot-password', [PasswordController::class, 'forgotPassword']);
-Route::post('/reset-password',  [PasswordController::class, 'resetPassword']);
+Route::post('/login',    [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login');
+Route::post('/forgot-password', [PasswordController::class, 'forgotPassword'])->middleware('throttle:3,60');
+Route::post('/reset-password',  [PasswordController::class, 'resetPassword'])->middleware('throttle:5,30');
 
 Route::middleware(['auth:api'])->group(function () {
     Route::get('/me',       [AuthController::class, 'me'])->middleware('cache.json:5');

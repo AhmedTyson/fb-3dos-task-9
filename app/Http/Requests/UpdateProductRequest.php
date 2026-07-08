@@ -16,9 +16,9 @@ class UpdateProductRequest extends FormRequest
         return [
             'category_id' => 'required|exists:categories,id',
             'name'        => 'required|string|max:255',
-            'description' => 'required|string',
+            'description' => 'nullable|string',
             'size'        => 'required|string|max:50',
-            'base_price'  => 'required|numeric',
+            'base_price'  => 'required|numeric|min:0',
             'in_stock'    => 'required|boolean',
             'images'      => 'nullable|array',
         ];

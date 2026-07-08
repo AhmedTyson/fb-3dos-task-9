@@ -22,6 +22,7 @@ class OrderService
 
         return DB::transaction(function () use ($cart, $user, $shippingAddress, $paymentMethod) {
             $total = $cart->items->sum(function ($item) {
+                if (!$item->product) return 0;
                 return $item->quantity * $item->product->base_price;
             });
 

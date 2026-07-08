@@ -43,7 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             $payload = ['message' => $message, 'data' => $data];
 
-            if (config('app.debug') && $status >= 500) {
+            if (config('app.debug') && app()->environment('local') && $status >= 500) {
                 $payload['debug'] = [
                     'file'  => $e->getFile() . ':' . $e->getLine(),
                     'type'  => get_class($e),
