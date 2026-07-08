@@ -1,22 +1,27 @@
 <?php
 
-use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminOrderController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login',    [AuthController::class, 'login'])->name('login');
+Route::post('/forgot-password', [PasswordController::class, 'forgotPassword']);
+Route::post('/reset-password',  [PasswordController::class, 'resetPassword']);
 
 Route::middleware(['auth:api'])->group(function () {
-    Route::get('/me',     [AuthController::class, 'me'])->middleware('cache.json:5');
-    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me',       [AuthController::class, 'me'])->middleware('cache.json:5');
+    Route::post('/logout',  [AuthController::class, 'logout']);
 
-    Route::get('/cart',                [CartController::class, 'index'])->middleware('cache.json:5');
-    Route::post('/cart/items',         [CartController::class, 'store']);
-    Route::put('/cart/items/{item}',   [CartController::class, 'update']);
-    Route::delete('/cart/items/{item}', [CartController::class, 'destroy']);
+    Route::get('/cart',                  [CartController::class, 'index'])->middleware('cache.json:5');
+    Route::post('/cart/items',           [CartController::class, 'store']);
+    Route::put('/cart/items/{item}',     [CartController::class, 'update']);
+    Route::delete('/cart/items/{item}',  [CartController::class, 'destroy']);
+
+    Route::post('/products', [ProductController::class, 'store']);
 });
 
 Route::middleware(['auth:api', 'isAdmin'])->group(function () {
@@ -30,3 +35,6 @@ Route::middleware(['auth:api', 'isAdmin'])->group(function () {
     Route::put('/products/{product}',    [ProductController::class, 'update']);
     Route::delete('/products/{product}', [ProductController::class, 'destroy']);
 });
+
+Route::get('/products',           [ProductController::class, 'index'])->middleware('cache.json:5');
+Route::get('/products/{product}', [ProductController::class, 'show'])->middleware('cache.json:5');
