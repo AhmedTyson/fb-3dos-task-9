@@ -18,7 +18,7 @@ class ProductController extends Controller
         $limit = min((int) $request->query('per_page', 10), 100);
 
         $products = Product::with('category')
-            ->filter($request->only(['category_id', 'search', 'min_price', 'max_price']))
+            ->filter($request->only(['category_id', 'search', 'min_price', 'max_price', 'sort']))
             ->paginate($limit);
 
         return response()->json([

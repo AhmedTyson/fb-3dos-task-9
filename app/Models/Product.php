@@ -56,6 +56,13 @@ class Product extends Model
             $query->where('base_price', '>=', $minPrice);
         })->when($filters['max_price'] ?? null, function ($query, $maxPrice) {
             $query->where('base_price', '<=', $maxPrice);
+        })->when($filters['sort'] ?? null, function ($query, $sort) {
+            match ($sort) {
+                'price_asc' => $query->orderBy('base_price', 'asc'),
+                'price_desc' => $query->orderBy('base_price', 'desc'),
+                'newest' => $query->orderBy('created_at', 'desc'),
+                default => $query->orderBy('id', 'asc'),
+            };
         });
     }
 }

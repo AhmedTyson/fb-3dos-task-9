@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\CheckoutData;
+use App\DTOs\AddressDTO;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\UserOrderCollection;
 use App\Http\Resources\UserOrderResource;
@@ -34,11 +36,12 @@ class OrderController extends Controller
 
     public function store(StoreOrderRequest $request): JsonResponse
     {
-        $order = $this->orderService->checkout(
-            $request->user(),
-            $request->validated('shipping_address'),
-            $request->validated('payment_method')
-        );
+        $order = $this->orderService->checkout(new CheckoutData(
+            user: $request->user(),
+            shippingAddress: AddressDTO::fromArray($request->validated('shipping_address')),
+            paymentMethod: $request->validated('payment_method'),
+            phone: $request->validated('phone')
+        ));
 
         return response()->json([
             'message' => 'Order placed successfully',

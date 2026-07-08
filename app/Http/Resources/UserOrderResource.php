@@ -11,6 +11,7 @@ class UserOrderResource extends JsonResource
     {
         return [
             'id'               => $this->id,
+            'phone'            => $this->phone,
             'status'           => $this->status?->value,
             'total'            => $this->total,
             'shipping_address' => $this->shipping_address,

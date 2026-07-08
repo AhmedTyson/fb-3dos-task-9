@@ -16,6 +16,7 @@ class AdminOrderResource extends JsonResource
     {
         return [
             'id'            => $this->id,
+            'phone'         => $this->phone,
             'customer_name' => $this->user?->name,
             'status'        => $this->status?->value,
             'total'         => $this->total,

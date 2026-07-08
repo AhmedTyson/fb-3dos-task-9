@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTOs\CheckoutData;
 use App\Enums\OrderStatus;
 use App\Models\Cart;
 use App\Models\Order;
@@ -12,27 +13,28 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class OrderService
 {
-    public function checkout(User $user, array $shippingAddress, string $paymentMethod): Order
+    public function checkout(CheckoutData $data): Order
     {
-        $cart = Cart::firstOrCreate(['user_id' => $user->id]);
+        $cart = Cart::firstOrCreate(['user_id' => $data->user->id]);
         $cart->load('items.product');
 
         if ($cart->items->isEmpty()) {
             throw new UnprocessableEntityHttpException('Cart is empty');
         }
 
-        return DB::transaction(function () use ($cart, $user, $shippingAddress, $paymentMethod) {
+        return DB::transaction(function () use ($cart, $data) {
             $total = $cart->items->sum(function ($item) {
                 if (!$item->product) return 0;
                 return $item->quantity * $item->product->base_price;
             });
 
             $order = Order::create([
-                'user_id'          => $user->id,
+                'user_id'          => $data->user->id,
+                'phone'            => $data->phone,
                 'status'           => OrderStatus::Pending,
                 'total'            => $total,
-                'shipping_address' => $shippingAddress,
-                'payment_method'   => $paymentMethod,
+                'shipping_address' => $data->shippingAddress->toArray(),
+                'payment_method'   => $data->paymentMethod,
             ]);
 
             $orderItems = $cart->items->filter(fn($item) => $item->product)->map(function ($item) {

@@ -73,9 +73,8 @@
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
-        const email = urlParams.get('email');
+        const token = "{{ $token ?? '' }}";
+        const email = "{{ $email ?? '' }}";
 
         const passwordInput = document.getElementById('password');
         const confirmInput = document.getElementById('password_confirmation');

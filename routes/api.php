@@ -8,10 +8,13 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
+use Intervention\Image\Laravel\Facades\Image;
+
+use App\Http\Controllers\ImageCacheController;
 
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login',    [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login');
-Route::post('/forgot-password', [PasswordController::class, 'forgotPassword'])->middleware('throttle:3,60');
+Route::post('/forgot-password', [PasswordController::class, 'forgetPassword'])->middleware('throttle:3,60');
 Route::post('/reset-password',  [PasswordController::class, 'resetPassword'])->middleware('throttle:5,30');
 
 Route::middleware(['auth:api'])->group(function () {
@@ -46,3 +49,8 @@ Route::middleware(['auth:api', 'isAdmin'])->group(function () {
 
 Route::get('/products',           [ProductController::class, 'index'])->middleware('cache.json:5');
 Route::get('/products/{product}', [ProductController::class, 'show'])->middleware('cache.json:5');
+Route::get('/categories', function () {
+    return response()->json(['data' => \App\Models\Category::select('id', 'name')->get()]);
+})->middleware('cache.json:5');
+
+Route::get('/storage/{path}', [ImageCacheController::class, 'show'])->where('path', '.*');

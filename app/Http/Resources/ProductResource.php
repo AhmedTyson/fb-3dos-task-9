@@ -18,6 +18,7 @@ class ProductResource extends JsonResource
             'base_price'  => (float) $this->base_price,
             'in_stock'    => (bool) $this->in_stock,
             'images'      => $this->images ?? [],
+            'thumbnail'   => !empty($this->images) ? '/api/storage/' . ltrim(str_replace('/storage/', '', $this->images[0]), '/') . '?w=400' : null,
             'created_at'  => $this->created_at?->toIso8601String(),
         ];
     }
