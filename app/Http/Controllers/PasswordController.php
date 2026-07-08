@@ -32,23 +32,32 @@ class PasswordController extends Controller
 
     public function resetPassword(Request $request){
         $request->validate([
-            "email"=>["required", "email", "exists:users,email"],
-            "password"=>["required", "confirmed", "min:8"],
-            "token"=>["required"]
+            "email"    => ["required", "email", "exists:users,email"],
+            "password" => ["required", "min:8"],
+            "token"    => ["required"]
         ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        // Check if token is valid
+        if (!Password::broker()->tokenExists($user, $request->token)) {
+            return response()->json([
+                "message" => "passwords.token"
+            ], 422);
+        }
+
         // 2. change user password
-        $status = Password::reset($request->only("email", "password", "token"), 
-        function(User $user, string $password){
-            $user->update([
-                "password" => Hash::make($password),
-            ]);
-        });
+        $user->forceFill([
+            "password"       => Hash::make($request->password),
+            "remember_token" => Str::random(60),
+        ])->save();
+
+        // Invalidate old token
+        Password::broker()->deleteToken($user);
 
         // 3. return response
         return response()->json([
-            "message"=> $status == Password::PASSWORD_RESET
-                ? 200
-                : 422
+            "message" => 200
         ]);
     }
 }
