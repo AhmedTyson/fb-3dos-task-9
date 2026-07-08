@@ -16,29 +16,49 @@
         <div class="text-center mb-8">
             <h1 class="text-2xl font-bold text-gray-900 mb-2">TechAccessories</h1>
             <h2 class="text-xl font-semibold text-gray-800">Create New Password</h2>
-            <p class="text-sm text-gray-500 mt-2">Your new password must be at least 8 characters long.</p>
+            <p class="text-sm text-gray-500 mt-2">Secure your account with a strong password.</p>
         </div>
 
         <div id="alert-box" class="hidden mb-6 p-4 rounded-lg text-sm"></div>
 
         <form id="reset-form" class="space-y-5">
+            <!-- New Password -->
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-                <input type="password" id="password" required minlength="8"
-                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50 focus:bg-white"
-                    placeholder="••••••••">
+                <div class="relative">
+                    <input type="password" id="password" required
+                        class="w-full pl-4 pr-10 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50 focus:bg-white"
+                        placeholder="••••••••">
+                    <button type="button" onclick="togglePassword('password')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <svg id="password-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </button>
+                </div>
+                <!-- Validation Checklist -->
+                <ul id="password-reqs" class="text-xs text-gray-500 mt-3 space-y-1.5 transition-all">
+                    <li id="req-length" class="flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> At least 8 characters</li>
+                    <li id="req-upper" class="flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 uppercase letter</li>
+                    <li id="req-lower" class="flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 lowercase letter</li>
+                    <li id="req-number" class="flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 number</li>
+                    <li id="req-special" class="flex items-center"><svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 1 special character</li>
+                </ul>
             </div>
 
+            <!-- Confirm Password -->
             <div>
                 <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
-                <input type="password" id="password_confirmation" required minlength="8"
-                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50 focus:bg-white"
-                    placeholder="••••••••">
+                <div class="relative">
+                    <input type="password" id="password_confirmation" required
+                        class="w-full pl-4 pr-10 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-gray-50 focus:bg-white"
+                        placeholder="••••••••">
+                    <button type="button" onclick="togglePassword('password_confirmation')" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <svg id="password_confirmation-eye" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </button>
+                </div>
                 <p id="match-error" class="hidden text-xs text-red-600 mt-1">Passwords do not match.</p>
             </div>
 
-            <button type="submit" id="submit-btn" 
-                class="w-full bg-gray-900 hover:bg-gray-800 text-white font-medium py-2.5 rounded-lg transition-colors flex justify-center items-center mt-6">
+            <button type="submit" id="submit-btn" disabled
+                class="w-full bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition-colors flex justify-center items-center mt-6">
                 <span>Update Password</span>
             </button>
         </form>
@@ -50,25 +70,84 @@
         const token = urlParams.get('token');
         const email = urlParams.get('email');
 
-        document.getElementById('reset-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const btn = document.getElementById('submit-btn');
-            const alertBox = document.getElementById('alert-box');
-            const matchError = document.getElementById('match-error');
-            
-            const password = document.getElementById('password').value;
-            const passwordConf = document.getElementById('password_confirmation').value;
+        // Elements
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('password_confirmation');
+        const submitBtn = document.getElementById('submit-btn');
+        const matchError = document.getElementById('match-error');
 
-            // Frontend Password Confirmation Validation (Backend ignores confirmation)
-            if (password !== passwordConf) {
-                matchError.classList.remove('hidden');
-                document.getElementById('password_confirmation').classList.add('border-red-500', 'focus:ring-red-500');
-                return;
+        // Validation Elements
+        const reqs = {
+            length: document.getElementById('req-length'),
+            upper: document.getElementById('req-upper'),
+            lower: document.getElementById('req-lower'),
+            number: document.getElementById('req-number'),
+            special: document.getElementById('req-special')
+        };
+
+        // Eye Icon SVG Paths
+        const iconEye = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>';
+        const iconEyeSlash = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path>';
+
+        // Show/Hide Password Toggle
+        window.togglePassword = function(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(inputId + '-eye');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerHTML = iconEyeSlash;
+            } else {
+                input.type = 'password';
+                icon.innerHTML = iconEye;
+            }
+        };
+
+        // Real-time Password Validation
+        function validatePassword() {
+            const pw = passwordInput.value;
+            const conf = confirmInput.value;
+
+            const rules = {
+                length: pw.length >= 8,
+                upper: /[A-Z]/.test(pw),
+                lower: /[a-z]/.test(pw),
+                number: /[0-9]/.test(pw),
+                special: /[^A-Za-z0-9]/.test(pw)
+            };
+
+            // Update UI checklist colors
+            for (const [key, isValid] of Object.entries(rules)) {
+                if (isValid) {
+                    reqs[key].classList.replace('text-gray-500', 'text-green-600');
+                } else {
+                    reqs[key].classList.replace('text-green-600', 'text-gray-500');
+                }
             }
 
-            matchError.classList.add('hidden');
-            document.getElementById('password_confirmation').classList.remove('border-red-500', 'focus:ring-red-500');
+            // Check Passwords Match
+            const isMatch = pw === conf && conf.length > 0;
+            if (conf.length > 0 && !isMatch) {
+                matchError.classList.remove('hidden');
+                confirmInput.classList.add('border-red-500', 'focus:ring-red-500');
+            } else {
+                matchError.classList.add('hidden');
+                confirmInput.classList.remove('border-red-500', 'focus:ring-red-500');
+            }
+
+            // Enable/Disable Button
+            const allRulesMet = Object.values(rules).every(Boolean);
+            submitBtn.disabled = !(allRulesMet && isMatch);
+        }
+
+        passwordInput.addEventListener('input', validatePassword);
+        confirmInput.addEventListener('input', validatePassword);
+
+        // Form Submit
+        document.getElementById('reset-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const alertBox = document.getElementById('alert-box');
+            
+            if (submitBtn.disabled) return; // Prevent submission if JS validation fails
 
             if (!token || !email) {
                 alertBox.className = 'mb-6 p-4 rounded-lg text-sm bg-red-50 text-red-800 border border-red-200';
@@ -77,8 +156,8 @@
                 return;
             }
 
-            btn.disabled = true;
-            btn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
             alertBox.classList.add('hidden');
 
             try {
@@ -91,8 +170,8 @@
                     body: JSON.stringify({ 
                         email, 
                         token, 
-                        password 
-                        // Notice: NO password_confirmation sent to the backend!
+                        password: passwordInput.value,
+                        password_confirmation: confirmInput.value
                     })
                 });
 
@@ -114,8 +193,8 @@
                 alertBox.textContent = msg;
                 alertBox.classList.remove('hidden');
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<span>Update Password</span>';
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Update Password</span>';
             }
         });
     </script>
