@@ -1,0 +1,60 @@
+body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            width: 100%;
+        }
+        .search-container i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        .search-container input {
+            padding-left: 45px;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            height: 45px;
+        }
+
+        /* Table Design */
+        .table-container {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+        .table th {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #6c757d;
+            letter-spacing: 0.5px;
+            background-color: #f8f9fa;
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .table td {
+            padding: 16px;
+            vertical-align: middle;
+            font-size: 14px;
+        }
+
+        /* Status Badges */
+        .badge-status {
+            font-weight: 600;
+            font-size: 11px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+        .status-completed { background-color: #e6f7ed; color: #1f9254; }
+        .status-pending { background-color: #fff3cd; color: #856404; }
+        .status-approved { background-color: #e8f2ff; color: #0d6efd; }
+        .status-cancelled { background-color: #f8d7da; color: #721c24; }

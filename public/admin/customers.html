@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AdminPanel - E-commerce Manager</title>
+    <link rel="icon" href="image/" />
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/customers.css" />
+  </head>
+  <body>
+    <header class="navbar navbar-dark bg-dark shadow-sm d-lg-none sticky-top px-3 py-2">
+      <button class="navbar-toggler border-0" type="button" id="menuToggleBtn" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand fw-bold text-primary fs-5 m-0" href="#"><i class="fa-solid fa-layer-group"></i> AdminPanel</a>
+    </header>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <aside class="col-lg-2 sidebar d-flex flex-column justify-content-between p-0 position-fixed" id="sidebarMenu">
+          <div>
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold m-0 text-primary d-flex align-items-center gap-2"><i class="fa-solid fa-layer-group"></i> AdminPanel</h5>
+                <small class="text-muted">E-commerce Manager</small>
+              </div>
+              <button class="btn-close d-lg-none" id="closeSidebarBtn"></button>
+            </div>
+            <ul class="nav flex-column mt-3">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="products.html"><i class="fa-solid fa-box-open"></i> Products</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="orders.html"><i class="fa-solid fa-cart-shopping"></i> Orders</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="customers.html"><i class="fa-solid fa-users"></i> Customers</a>
+              </li>
+            </ul>
+          </div>
+          <div class="user-profile d-flex align-items-center gap-2">
+            <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px">
+              <i class="fa-solid fa-user-gear"></i>
+            </div>
+            <div class="overflow-hidden">
+              <h6 class="m-0 text-truncate font-weight-bold" style="font-size: 0.9rem">Store Admin</h6>
+              <small class="text-muted text-truncate d-block" style="font-size: 0.75rem">admin@store.com</small>
+            </div>
+          </div>
+        </aside>
+
+        <main class="col-lg-10 ms-auto main-content p-4 px-lg-5">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div class="search-container max-width-600">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="searchInput" class="form-control rounded-3" placeholder="Search customers by name, email, or last order ID..." />
+            </div>
+            <div class="d-flex align-items-center gap-2 justify-content-end">
+              <button class="btn btn-light border" id="refreshBtn"><i class="fa-solid fa-rotate" id="refreshIcon"></i></button>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <h2 class="fw-bold mb-1">Customer Database</h2>
+            <p class="text-muted mb-0">Manage customer accounts and track their order activity.</p>
+          </div>
+
+          <div class="table-container">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead>
+                  <tr>
+                    <th>Customer Info</th>
+                    <th>Email</th>
+                    <th>Registered Date</th>
+                    <th>Orders Count</th>
+                    <th>Role</th>
+                  </tr>
+                </thead>
+                <tbody id="customersTableBody"></tbody>
+              </table>
+            </div>
+
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center p-3 bg-light border-top gap-3">
+              <small class="text-muted" id="tableSummary">Loading...</small>
+              <nav>
+                <ul class="pagination pagination-sm mb-0" id="paginationNav">
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/customers.js"></script>
+  </body>
+</html>

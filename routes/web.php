@@ -11,9 +11,9 @@ Route::get('/forgot-password', function () {
     return view('auth.forgot-password');
 });
 
-Route::get('/reset-password/{token}', function (string $token, Request $request) {
+Route::get('/reset-password', function (Request $request) {
     return view('auth.reset-password', [
-        'token' => $token,
+        'token' => $request->token,
         'email' => $request->email
     ]);
 })->name('password.reset');

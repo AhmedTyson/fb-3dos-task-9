@@ -1,0 +1,241 @@
+:root {
+    --bg-light: #f4f6f9;
+    --sidebar-bg: #ffffff;
+    --primary-color: #0d6efd;
+    --text-dark: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+body {
+    background-color: var(--bg-light);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-dark);
+    overflow-x: hidden;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+    background-color: var(--sidebar-bg);
+    min-height: 100vh;
+    border-right: 1px solid #e5e9f2;
+    transition: var(--transition-smooth);
+    z-index: 1045;
+    width: 260px;
+}
+
+.sidebar .nav-link {
+    color: var(--text-muted);
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin: 4px 15px;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 500;
+}
+
+.sidebar .nav-link i {
+    transition: var(--transition-smooth);
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar .nav-link:hover {
+    color: var(--primary-color);
+    background-color: rgba(13, 110, 253, 0.08);
+    transform: translateX(5px);
+}
+
+.sidebar .nav-link:hover i {
+    transform: scale(1.15);
+}
+
+.sidebar .nav-link.active {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: var(--primary-color);
+    border-left: 4px solid var(--primary-color);
+}
+
+/* --- Main Content Area --- */
+.main-content {
+    padding: 40px;
+    transition: var(--transition-smooth);
+}
+
+.page-header h3 {
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+/* --- Filter Card Styling --- */
+.filter-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+}
+
+.form-select-custom {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    background-color: #fff;
+    transition: var(--transition-smooth);
+}
+
+.form-select-custom:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+    outline: none;
+}
+
+/* --- Product Table Card --- */
+.product-card {
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.01);
+    overflow: hidden;
+}
+
+.table th {
+    padding: 16px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+}
+
+.table td {
+    padding: 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+/* صندوق عرض صورة المنتج داخل الجدول والمودال */
+.prod-img-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background-color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.prod-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* صندوق معاينة الصورة داخل المودال قبل الحفظ */
+.image-preview-container {
+    width: 65px;
+    height: 65px;
+    border: 2px dashed var(--border-color);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8fafc;
+    overflow: hidden;
+}
+
+.image-preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Category Badges */
+.badge-category {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.cat-audio {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+.cat-peripherals {
+    background-color: #f5f3ff;
+    color: #7c3aed;
+}
+
+.cat-furniture {
+    background-color: #fff7ed;
+    color: #ea580c;
+}
+
+.cat-computing {
+    background-color: #f0fdf4;
+    color: #16a34a;
+}
+
+/* Stock Status */
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+}
+
+.status-in-stock {
+    background-color: #10b981;
+}
+
+.status-low-stock {
+    background-color: #f59e0b;
+}
+
+.status-out-of-stock {
+    background-color: #ef4444;
+}
+
+.user-profile {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 10px;
+    margin: 15px;
+    border: 1px solid var(--border-color);
+}
+
+/* --- Media Queries الشاشات الصغيرة والمتوسطة --- */
+@media (max-width: 991.98px) {
+    .main-content {
+        padding: 20px;
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .page-header h3 {
+        font-size: 1.4rem;
+    }
+
+    .page-header p {
+        font-size: 0.85rem;
+    }
+
+    .table td,
+    .table th {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+}

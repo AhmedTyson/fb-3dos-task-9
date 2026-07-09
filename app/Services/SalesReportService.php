@@ -59,6 +59,43 @@ class SalesReportService
         ];
     }
 
+    public function bestSellers(?string $from, ?string $to, int $limit = 10): array
+    {
+        return Product::select(
+            'products.id',
+            'products.name',
+            'products.base_price',
+            'products.images',
+            DB::raw('SUM(order_items.quantity) as units_sold'),
+            DB::raw('SUM(order_items.subtotal) as total_revenue')
+        )
+            ->join('order_items', 'products.id', '=', 'order_items.product_id')
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->when($from, fn($q) => $q->whereDate('orders.created_at', '>=', $from))
+            ->when($to,   fn($q) => $q->whereDate('orders.created_at', '<=', $to))
+            ->groupBy('products.id', 'products.name', 'products.base_price', 'products.images')
+            ->orderByDesc('units_sold')
+            ->limit($limit)
+            ->get()
+            ->toArray();
+    }
+
+    public function dailyBreakdown(?string $from, ?string $to): array
+    {
+        return Order::query()
+            ->select(
+                DB::raw("DATE(created_at) as date"),
+                DB::raw('COUNT(*) as order_count'),
+                DB::raw('COALESCE(SUM(total), 0) as revenue')
+            )
+            ->when($from, fn($q) => $q->whereDate('created_at', '>=', $from))
+            ->when($to,   fn($q) => $q->whereDate('created_at', '<=', $to))
+            ->groupBy(DB::raw("DATE(created_at)"))
+            ->orderBy('date')
+            ->get()
+            ->toArray();
+    }
+
     private function mapOrderRows(Builder $query): Collection
     {
         return $query

@@ -18,15 +18,23 @@ class Product extends Model
         'description',
         'size',
         'base_price',
-        'in_stock',
+        'stock',
         'images',
     ];
 
     protected $casts = [
-        'images' => 'array',
-        'in_stock' => 'boolean',
+        'images'     => 'array',
+        'in_stock'   => 'boolean',
         'base_price' => 'float',
+        'stock'      => 'integer',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Product $product) {
+            $product->in_stock = $product->stock > 0;
+        });
+    }
 
     public function category(): BelongsTo
     {

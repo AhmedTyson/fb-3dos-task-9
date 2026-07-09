@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AdminPanel - E-commerce Manager</title>
+    <link rel="icon" href="image/" />
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/order.css" />
+  </head>
+  <body>
+    <header class="navbar navbar-dark bg-dark shadow-sm d-lg-none sticky-top px-3 py-2">
+      <button class="navbar-toggler border-0" type="button" id="menuToggleBtn" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand fw-bold text-primary fs-5 m-0" href="#"><i class="fa-solid fa-layer-group"></i> AdminPanel</a>
+    </header>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <aside class="col-lg-2 sidebar d-flex flex-column justify-content-between p-0 position-fixed" id="sidebarMenu">
+          <div>
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold m-0 text-primary d-flex align-items-center gap-2"><i class="fa-solid fa-layer-group"></i> AdminPanel</h5>
+                <small class="text-muted">E-commerce Manager</small>
+              </div>
+              <button class="btn-close d-lg-none" id="closeSidebarBtn"></button>
+            </div>
+            <ul class="nav flex-column mt-3">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html"> <i class="fa-solid fa-chart-pie"></i> Dashboard </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="products.html"> <i class="fa-solid fa-box-open"></i> Products </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="orders.html"> <i class="fa-solid fa-cart-shopping"></i> Orders </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="customers.html"> <i class="fa-solid fa-users"></i> Customers </a>
+              </li>
+            </ul>
+          </div>
+ 
+          <div class="user-profile d-flex align-items-center gap-2">
+            <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px">
+              <i class="fa-solid fa-user-gear"></i>
+            </div>
+            <div class="overflow-hidden">
+              <h6 class="m-0 text-truncate font-weight-bold" style="font-size: 0.9rem">Store Admin</h6>
+              <small class="text-muted text-truncate d-block" style="font-size: 0.75rem">admin@store.com</small>
+            </div>
+          </div>
+        </aside>
+ 
+        <main class="col-lg-10 ms-auto main-content p-4 px-lg-5">
+          <div class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+            <div>
+              <h3 class="fw-bold m-0">Orders Management</h3>
+              <p class="text-muted m-0">Track customer purchases, fulfillment statuses, and process invoices.</p>
+            </div>
+          </div>
+ 
+          <div class="card filter-card p-3 mb-4">
+            <div class="row g-3 align-items-center">
+              <div class="col-12 col-md-4">
+                <label class="form-label text-muted fw-semibold small mb-1"><i class="fa-solid fa-magnifying-glass me-1"></i> Search Order</label>
+                <input type="text" class="form-control form-select-custom" id="searchOrdersBar" placeholder="Search by Order ID or Customer..." />
+              </div>
+ 
+              <div class="col-12 col-md-3">
+                <label class="form-label text-muted fw-semibold small mb-1"><i class="fa-solid fa-toggle-on me-1"></i> Order Status</label>
+                <select class="form-select form-select-custom" id="statusFilter">
+                  <option value="all">All Statuses</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+ 
+              <div class="col-12 col-md-3">
+                <label class="form-label text-muted fw-semibold small mb-1"><i class="fa-solid fa-arrow-down-up-lock me-1"></i> Sort Orders</label>
+                <select class="form-select form-select-custom" id="ordersSortFilter">
+                  <option value="default">Default (Latest)</option>
+                  <option value="price-high-low">Highest Amount</option>
+                  <option value="price-low-high">Lowest Amount</option>
+                </select>
+              </div>
+ 
+              <div class="col-12 col-md-2 d-flex justify-content-md-end align-items-end mt-md-4">
+                <button class="btn btn-light border text-muted px-3 py-2 w-100 d-flex align-items-center justify-content-center gap-2" id="clearOrdersFiltersBtn" style="border-radius: 8px">
+                  <i class="fa-solid fa-filter-circle-xmark"></i> Reset
+                </button>
+              </div>
+            </div>
+          </div>
+ 
+          <div class="card product-card">
+            <div class="table-responsive">
+              <table class="table align-middle m-0" id="ordersTable">
+                <thead class="table-light text-muted">
+                  <tr>
+                    <th>Order ID</th>
+                    <th>Customer</th>
+                    <th>Date</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ordersTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+ 
+    <div class="modal fade" id="orderStatusModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content shadow border-0" style="border-radius: 14px">
+          <div class="modal-header border-bottom py-3">
+            <h5 class="modal-title fw-bold">Update Order Status</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-4">
+            <form id="updateStatusForm">
+              <input type="hidden" id="statusOrderId" />
+              <div class="mb-3">
+                <label class="form-label text-muted small fw-bold">Select Status</label>
+                <select class="form-select form-select-custom" id="modalOrderStatus" required>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="completed">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+              <div class="text-end mt-4">
+                <button type="button" class="btn btn-light border px-3 me-1" data-bs-dismiss="modal" style="border-radius: 8px">Cancel</button>
+                <button type="submit" class="btn btn-primary px-3" style="border-radius: 8px">Update</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="modal fade" id="deleteOrderConfirmModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content shadow border-0" style="border-radius: 14px">
+          <div class="modal-body text-center p-4">
+            <div class="text-danger mb-3">
+              <i class="fa-solid fa-circle-exclamation fs-1"></i>
+            </div>
+            <h5 class="fw-bold text-dark mb-2">Delete Order?</h5>
+            <p class="text-muted small mb-4">Are you sure you want to remove this order from records?</p>
+            <div class="d-flex justify-content-center gap-2">
+              <button type="button" class="btn btn-light border px-3" data-bs-dismiss="modal" style="border-radius: 8px">Cancel</button>
+              <button type="button" class="btn btn-danger px-3" id="confirmDeleteOrderBtn" style="border-radius: 8px">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/orders.js"></script>
+  </body>
+</html>
+ 

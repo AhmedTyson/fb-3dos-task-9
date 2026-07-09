@@ -31,7 +31,10 @@ class ProductController extends Controller
     {
         Gate::authorize('create', Product::class);
 
-        $product = Product::create($request->validated());
+        $data = $request->validated();
+        $data['images'] = $this->handleImages($request);
+
+        $product = Product::create($data);
         $product->load('category');
 
         return response()->json([
@@ -54,7 +57,9 @@ class ProductController extends Controller
     {
         Gate::authorize('update', $product);
 
-        $product->update($request->validated());
+        $data = $request->validated();
+        $data['images'] = $this->handleImages($request, $product->images ?? []);
+        $product->update($data);
 
         return response()->json([
             'message' => 'Product updated successfully',
@@ -72,5 +77,19 @@ class ProductController extends Controller
             'message' => 'Product deleted successfully',
             'data'    => null,
         ]);
+    }
+
+    private function handleImages(Request $request, array $existing = []): array
+    {
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('products', 'public');
+            return ['/storage/' . $path];
+        }
+
+        if ($request->filled('image_url')) {
+            return [$request->input('image_url')];
+        }
+
+        return $existing;
     }
 }

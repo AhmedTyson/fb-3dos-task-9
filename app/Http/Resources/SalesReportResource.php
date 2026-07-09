@@ -15,10 +15,12 @@ class SalesReportResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'period'        => $this->resource['period'],
-            'total_orders'  => $this->resource['total_orders'],
-            'total_revenue' => $this->resource['total_revenue'],
-            'top_product'   => $this->resource['top_product'],
+            'period'          => $this->resource['period'],
+            'total_orders'    => $this->resource['total_orders'],
+            'total_revenue'   => $this->resource['total_revenue'],
+            'top_product'     => $this->resource['top_product'],
+            'best_sellers'    => $this->resource['best_sellers'] ?? [],
+            'daily_breakdown' => $this->resource['daily_breakdown'] ?? [],
         ];
     }
 }

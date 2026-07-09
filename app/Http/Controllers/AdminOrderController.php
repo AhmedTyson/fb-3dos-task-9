@@ -34,10 +34,12 @@ class AdminOrderController extends Controller
             $request->integer('per_page', 20)
         );
 
-        return response()->json([
-            'message' => 'Orders fetched',
-            'data'    => new AdminOrderCollection($orders),
-        ]);
+        return (new AdminOrderCollection($orders))
+            ->response()
+            ->header('X-Pagination-Total-Count', $orders->total())
+            ->header('X-Pagination-Current-Page', $orders->currentPage())
+            ->header('X-Pagination-Per-Page', $orders->perPage())
+            ->header('X-Pagination-Last-Page', $orders->lastPage());
     }
 
     public function updateStatus(UpdateOrderStatusRequest $request, Order $order): JsonResponse
@@ -57,14 +59,14 @@ class AdminOrderController extends Controller
 
     public function salesReport(SalesReportRequest $request): Response
     {
-        $format = strtolower($request->query('format', 'json'));
+        $from = $request->validated('from');
+        $to   = $request->validated('to');
 
-        $report = $this->salesReportService->generate(
-            $request->validated('from'),
-            $request->validated('to'),
-        );
+        $report = $this->salesReportService->generate($from, $to);
+        $report['best_sellers']    = $this->salesReportService->bestSellers($from, $to, 10);
+        $report['daily_breakdown'] = $this->salesReportService->dailyBreakdown($from, $to);
 
-        return match ($format) {
+        return match (strtolower($request->query('format', 'json'))) {
             'xlsx'  => $this->xlsxDownload($report),
             'pdf'   => $this->pdfService->salesReport($report),
             default => response()->json([

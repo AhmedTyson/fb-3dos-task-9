@@ -15,12 +15,15 @@ class AdminOrderResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'            => $this->id,
-            'phone'         => $this->phone,
-            'customer_name' => $this->user?->name,
-            'status'        => $this->status?->value,
-            'total'         => $this->total,
-            'created_at'    => $this->created_at->toIso8601String(),
+            'id'              => $this->id,
+            'phone'           => $this->phone,
+            'customer_name'   => $this->user?->name,
+            'customer_email'  => $this->user?->email,
+            'status'          => $this->status?->value,
+            'total'           => $this->total,
+            'shipping_address' => $this->shipping_address,
+            'items_count'     => $this->whenLoaded('items', fn() => $this->items->count()),
+            'created_at'      => $this->created_at->toIso8601String(),
         ];
     }
 }

@@ -21,11 +21,18 @@ class CacheJsonResponse
 
         $cached = Cache::get($cacheKey, false);
         if ($cached !== false) {
-            return response()->json([
+            $response = [
                 'message' => $cached['message'] ?? '',
                 'source'  => 'redis',
                 'data'    => $cached['data'] ?? null,
-            ]);
+            ];
+            // Preserve extra keys (pagination, meta, etc.) from cached response
+            foreach ($cached as $key => $value) {
+                if (!in_array($key, ['message', 'source', 'data'], true)) {
+                    $response[$key] = $value;
+                }
+            }
+            return response()->json($response);
         }
 
         $response = $next($request);
@@ -35,11 +42,18 @@ class CacheJsonResponse
 
             Cache::put($cacheKey, $original, now()->addMinutes($ttl));
 
-            $response->setData([
+            $base = [
                 'message' => $original['message'] ?? '',
                 'source'  => 'database',
                 'data'    => $original['data'] ?? null,
-            ]);
+            ];
+            // Preserve extra keys (pagination, meta, etc.) in the response
+            foreach ($original as $key => $value) {
+                if (!in_array($key, ['message', 'data'], true)) {
+                    $base[$key] = $value;
+                }
+            }
+            $response->setData($base);
         }
 
         return $response;

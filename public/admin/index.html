@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AdminPanel - E-commerce Manager</title>
+    <link rel="icon" href="image/" />
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <header class="navbar navbar-dark bg-dark shadow-sm d-lg-none sticky-top px-3 py-2">
+      <button class="navbar-toggler border-0" type="button" id="menuToggleBtn" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand fw-bold text-primary fs-5 m-0" href="#"><i class="fa-solid fa-layer-group"></i> AdminPanel</a>
+    </header>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <aside class="col-lg-2 sidebar d-flex flex-column justify-content-between p-0 position-fixed" id="sidebarMenu">
+          <div>
+            <div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold m-0 text-primary d-flex align-items-center gap-2"><i class="fa-solid fa-layer-group"></i> AdminPanel</h5>
+                <small class="text-muted">E-commerce Manager</small>
+              </div>
+              <button class="btn-close d-lg-none" id="closeSidebarBtn"></button>
+            </div>
+            <ul class="nav flex-column mt-3">
+              <li class="nav-item">
+                <a class="nav-link active" href="index.html"> <i class="fa-solid fa-chart-pie"></i> Dashboard </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="products.html"> <i class="fa-solid fa-box-open"></i> Products </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="orders.html"> <i class="fa-solid fa-cart-shopping"></i> Orders </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="customers.html"> <i class="fa-solid fa-users"></i> Customers </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="user-profile d-flex align-items-center gap-2">
+            <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center" style="width: 40px; height: 40px">
+              <i class="fa-solid fa-user-gear"></i>
+            </div>
+            <div class="overflow-hidden">
+              <h6 class="m-0 text-truncate font-weight-bold" style="font-size: 0.9rem">Store Admin</h6>
+              <small class="text-muted text-truncate d-block" style="font-size: 0.75rem">admin@store.com</small>
+            </div>
+          </div>
+        </aside>
+
+        <main class="col-lg-10 ms-auto main-content p-4 px-lg-5">
+          <header class="mb-4">
+            <h3 class="fw-bold m-0 mb-4">Dashboard</h3>
+
+            <div class="card filter-card p-4 shadow-sm border-0" style="border-radius: 12px">
+              <h5 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-chart-pie me-2 text-primary"></i>Sales Report Generator</h5>
+
+              <div class="row g-3 align-items-end">
+                <div class="col-12 class-sm-6 col-md-4 col-xl-3">
+                  <label class="form-label text-muted fw-semibold small mb-1">From Date</label>
+                  <input type="date" class="form-control" id="reportFromDate" value="2026-06-01" style="border-radius: 8px; height: 41px" />
+                </div>
+
+                <div class="col-12 class-sm-6 col-md-4 col-xl-3">
+                  <label class="form-label text-muted fw-semibold small mb-1">To Date</label>
+                  <input type="date" class="form-control" id="reportToDate" value="2026-07-01" style="border-radius: 8px; height: 41px" />
+                </div>
+
+                <div class="col-12 col-md-4 col-xl-3">
+                  <label class="form-label text-muted fw-semibold small mb-1">Export Report</label>
+                  <div class="dropdown w-100">
+                    <button
+                      class="btn btn-success w-100 dropdown-toggle d-flex align-items-center justify-content-between px-3"
+                      type="button"
+                      id="exportReportDropdown"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                      style="border-radius: 8px; height: 41px">
+                      <span><i class="fa-solid fa-file-export me-2"></i>Export As...</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow border-0 w-100" aria-labelledby="exportReportDropdown" style="border-radius: 8px">
+                      <li>
+                        <a class="dropdown-item py-2 d-flex align-items-center gap-2 text-danger fw-medium" href="#" id="exportPdfBtn">
+                          <i class="fa-solid fa-file-pdf fs-5"></i> Download PDF Report
+                        </a>
+                      </li>
+                      <li>
+                        <hr class="dropdown-divider my-1" />
+                      </li>
+                      <li>
+                        <a class="dropdown-item py-2 d-flex align-items-center gap-2 text-success fw-medium" href="#" id="exportExcelBtn">
+                          <i class="fa-solid fa-file-excel fs-5"></i> Download Excel Report
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <section class="row g-3 mb-4">
+            <div class="col-12 col-sm-6 col-xl-4 animate-card">
+              <div class="card custom-card p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem">Total Orders</small>
+                      <h4 class="fw-bold mt-1 mb-0" id="kpi-total-orders"><span class="spinner-border spinner-border-sm text-primary"></span></h4>
+                  </div>
+                  <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1" style="font-size: 0.75rem">+8.4%</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-end mt-3">
+                  <div class="mini-bar-chart">
+                    <div class="mini-bar" data-height="15px"></div>
+                    <div class="mini-bar" data-height="25px"></div>
+                    <div class="mini-bar" data-height="20px"></div>
+                    <div class="mini-bar" data-height="35px"></div>
+                    <div class="mini-bar" data-height="45px"></div>
+                  </div>
+                  <i class="fa-solid fa-boxes-stacked text-primary fs-4 opacity-50 card-icon"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-4 animate-card">
+              <div class="card custom-card p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem">Total Sales</small>
+                      <h4 class="fw-bold mt-1 mb-0" id="kpi-total-sales"><span class="spinner-border spinner-border-sm text-primary"></span></h4>
+                  </div>
+                  <span class="badge bg-success-subtle text-success rounded-pill px-2 py-1" style="font-size: 0.75rem">+12%</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-end mt-3">
+                  <div class="mini-bar-chart">
+                    <div class="mini-bar bar-green" data-height="20px"></div>
+                    <div class="mini-bar bar-green" data-height="30px"></div>
+                    <div class="mini-bar bar-green" data-height="25px"></div>
+                    <div class="mini-bar bar-green" data-height="40px"></div>
+                    <div class="mini-bar bar-green" data-height="48px"></div>
+                  </div>
+                  <i class="fa-solid fa-money-bill-trend-up text-success fs-4 opacity-50 card-icon"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-sm-6 col-xl-4 animate-card">
+              <div class="card custom-card p-3">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <div>
+                    <small class="text-muted text-uppercase fw-bold" style="font-size: 0.75rem">Total Customers</small>
+                      <h4 class="fw-bold mt-1 mb-0" id="kpi-total-customers"><span class="spinner-border spinner-border-sm text-primary"></span></h4>
+                  </div>
+                  <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1" style="font-size: 0.75rem">+5.2%</span>
+                </div>
+                <div class="d-flex align-items-center justify-content-between mt-3">
+                  <div class="d-flex align-items-center">
+                    <div class="bg-secondary text-white border border-white d-flex align-items-center justify-content-center mock-avatar avatar-1">A</div>
+                    <div class="bg-dark text-white border border-white d-flex align-items-center justify-content-center mock-avatar avatar-2">B</div>
+                    <div class="bg-primary text-white border border-white d-flex align-items-center justify-content-center mock-avatar avatar-3">C</div>
+                    <span class="text-muted ms-3" style="font-size: 0.75rem; font-weight: 500">+1.8k more</span>
+                  </div>
+                  <i class="fa-solid fa-users text-info fs-4 opacity-50 card-icon"></i>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="row g-4 mb-4">
+            <div class="col-12 animate-card">
+              <div class="card custom-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h5 class="fw-bold m-0">Best Sellers</h5>
+                  <span class="text-muted" style="font-size: 0.85rem">Past 30 Days</span>
+                </div>
+                <div id="bestSellersContainer" class="row row-cols-2 row-cols-sm-5 g-2">
+                  <!-- skeleton -->
+                  <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+                  <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+                  <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+                  <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+                  <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-text"></div><div class="skeleton-text short"></div></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="row g-4 mb-4">
+            <div class="col-lg-8 animate-card">
+              <div class="card custom-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <div>
+                    <h5 class="fw-bold m-0">Sales vs. Orders</h5>
+                    <small class="text-muted">Real-time performance metrics</small>
+                  </div>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" class="btn btn-primary px-3" data-chart-mode="daily">Daily</button>
+                    <button type="button" class="btn btn-outline-secondary px-3" data-chart-mode="weekly">Weekly</button>
+                    <button type="button" class="btn btn-outline-secondary px-3" data-chart-mode="monthly">Monthly</button>
+                  </div>
+                </div>
+
+                <div class="chart-container">
+                  <canvas id="salesChart"></canvas>
+                </div>
+                <div class="d-flex justify-content-center gap-4 mt-3" style="font-size: 0.85rem">
+                  <span><span class="bullet-dot bg-primary"></span> Revenue (EGP)</span>
+                  <span><span class="bullet-dot bg-success"></span> Order Count</span>
+                </div>
+              </div>
+            </div>
+            <!-- هربط اخر اوردر و اخر كاستمر و اخر برودكت -->
+            <div class="col-lg-4 animate-card">
+              <div class="card custom-card p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <h5 class="fw-bold m-0">Recent Activity</h5>
+                  <a href="#" class="text-decoration-none btn-link" style="font-size: 0.85rem">View All</a>
+                </div>
+                <div id="recentActivityContainer" class="d-flex flex-column gap-3">
+                  <div class="skeleton-line w-100"></div>
+                  <div class="skeleton-line w-75"></div>
+                  <div class="skeleton-line w-90"></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="animate-card">
+            <div class="card custom-card p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+                <h5 class="fw-bold m-0">Pending Shipments</h5>
+                <button class="btn btn-light btn-sm border d-flex align-items-center gap-2"><i class="fa-solid fa-filter"></i> Filters</button>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-middle m-0">
+                  <thead class="table-light text-muted" style="font-size: 0.8rem; text-transform: uppercase">
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Customer</th>
+                      <th>Destination</th>
+                      <th>Items</th>
+                      <th>Status</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pendingShipmentsTbody" style="font-size: 0.85rem">
+                    <tr><td colspan="6"><div class="skeleton-line w-100"></div></td></tr>
+                    <tr><td colspan="6"><div class="skeleton-line w-100"></div></td></tr>
+                    <tr><td colspan="6"><div class="skeleton-line w-100"></div></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/script.js"></script>
+  </body>
+</html>

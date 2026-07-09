@@ -72,7 +72,7 @@ class OrderService
 
     public function getAdminOrders(array $filters, int $perPage): LengthAwarePaginator
     {
-        $query = Order::with('user:id,name');
+        $query = Order::with('user:id,name,email', 'items');
 
         if (!empty($filters['status'])) {
             $query->where('status', $filters['status']);

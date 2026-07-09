@@ -12,7 +12,13 @@ class AdminUserCollection extends ResourceCollection
     public function toArray(Request $request): array
     {
         return [
-            'items'      => $this->collection,
+            'data' => $this->collection,
+        ];
+    }
+
+    public function paginationInformation(Request $request, array $paginated, array $default): array
+    {
+        return [
             'pagination' => [
                 'current_page' => $this->resource->currentPage(),
                 'per_page'     => $this->resource->perPage(),
