@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Orders | LuxeGear Premium</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/sultan.css" />
+    <link rel="stylesheet" href="css/order.css" />
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navbar.js"></script>
+    <script>
+        if (!Auth.requireAuth()) {
+            window.location.href = "login.html";
+        }
+    </script>
+  </head>
+  <body class="overflow-x-hidden" style="padding-top: 90px; background-color: #f8f9fa;">
+    
+    <div id="navbar-placeholder"></div>
+
+    <main class="container mx-auto min-vh-100 px-3 px-md-4 my-5">
+      <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3 mb-4">
+        <div>
+          <h1 class="display-6 fw-bold mb-1 text-dark">Order History</h1>
+          <p class="mb-0 text-secondary">Manage your recent purchases and track shipments.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary d-flex align-items-center gap-1 px-3 py-2 rounded-3 fw-medium" id="filterOrdersBtn">
+            <i class="fa-solid fa-filter"></i> Filter
+          </button>
+          <button class="btn btn-primary d-flex align-items-center gap-1 px-3 py-2 rounded-3 fw-medium shadow-sm" id="newOrderBtn">
+            <i class="fa-solid fa-bag-shopping"></i> New Order
+          </button>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm rounded-3 overflow-hidden mb-5 bg-white">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0 text-start">
+            <thead class="table-light">
+              <tr class="table-header-row text-uppercase fs-7 text-secondary">
+                <th class="px-3 py-3 fw-semibold">ORDER #</th>
+                <th class="px-3 py-3 fw-semibold">DATE</th>
+                <th class="px-3 py-3 fw-semibold">ITEMS</th>
+                <th class="px-3 py-3 fw-semibold">STATUS</th>
+                <th class="px-3 py-3 fw-semibold">TOTAL</th>
+                <th class="px-3 py-3 fw-semibold text-end">ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="orders-tbody">
+              <tr class="loading-row">
+                <td colspan="6" class="p-5 text-center text-muted">Loading your orders...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h2 class="h3 fw-bold mb-4 text-dark">Because you liked these</h2>
+
+      <div id="products-grid" class="row">
+        <div class="col-12 p-5 text-center text-muted">Loading recommended products...</div>
+      </div>
+    </main>
+
+    <footer class="bg-dark text-white pt-5 pb-3 mt-5">
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col-lg-4 col-md-6 mb-4">
+            <h3 class="fw-bold text-primary mb-3">LuxeGear</h3>
+            <p class="text-white-50">Crafting moments of elegance and pure satisfaction in every detail.</p>
+            <div class="social-links d-flex gap-3 mt-4">
+              <a href="#" class="text-white-50 fs-5"><i class="fa-brands fa-facebook-f"></i></a>
+              <a href="#" class="text-white-50 fs-5"><i class="fa-brands fa-instagram"></i></a>
+              <a href="#" class="text-white-50 fs-5"><i class="fa-brands fa-x-twitter"></i></a>
+              <a href="#" class="text-white-50 fs-5"><i class="fa-brands fa-twitch"></i></a>
+              <a href="#" class="text-white-50 fs-5"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="mb-4 fw-semibold text-primary">Quick Links</h5>
+            <ul class="list-unstyled">
+              <li class="mb-2"><a href="home.html" class="text-white-50 text-decoration-none">Home</a></li>
+              <li class="mb-2"><a href="products.html" class="text-white-50 text-decoration-none">Products</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="mb-4 fw-semibold text-primary">Support</h5>
+            <ul class="list-unstyled">
+              <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Shipping Policy</a></li>
+              <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Return Policy</a></li>
+              <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">FAQs</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-3 col-md-6 mb-4">
+            <h5 class="mb-4 fw-semibold text-primary">Contact Info</h5>
+            <ul class="list-unstyled text-white-50">
+              <li class="mb-2"><i class="fa-solid fa-location-dot me-2 text-warning"></i> Cairo, Egypt</li>
+              <li class="mb-2"><i class="fa-solid fa-phone me-2 text-warning"></i> +20 123 456 789</li>
+              <li class="mb-2"><i class="fa-solid fa-envelope me-2 text-warning"></i> info@LuxeGear.com</li>
+            </ul>
+          </div>
+        </div>
+
+        <hr class="bg-secondary" />
+        <div class="text-center py-2">
+          <p class="mb-0 text-white-50">© 2026 LuxeGear Store. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/order.js"></script>
+  </body>
+</html>

@@ -16,13 +16,17 @@ class SalesReportService
     public function generate(?string $from, ?string $to): array
     {
         $base = $this->baseQuery($from, $to);
+        $totalOrders  = (clone $base)->count();
+        $totalRevenue = (float) (clone $base)->sum('total');
 
         return [
-            'period'        => ['from' => $from, 'to' => $to],
-            'total_orders'  => (clone $base)->count(),
-            'total_revenue' => (float) (clone $base)->sum('total'),
-            'top_product'   => $this->findTopProduct($from, $to),
-            'orders'        => $this->mapOrderRows(clone $base),
+            'period'          => ['from' => $from, 'to' => $to],
+            'total_orders'    => $totalOrders,
+            'total_revenue'   => $totalRevenue,
+            'avg_order_value' => $totalOrders > 0 ? round($totalRevenue / $totalOrders, 2) : 0,
+            'total_users'     => \App\Models\User::count(),
+            'top_product'     => $this->findTopProduct($from, $to),
+            'orders'          => $this->mapOrderRows(clone $base),
         ];
     }
 
@@ -82,15 +86,31 @@ class SalesReportService
 
     public function dailyBreakdown(?string $from, ?string $to): array
     {
-        return Order::query()
-            ->select(
+        return $this->breakdown($from, $to, 'daily');
+    }
+
+    public function breakdown(?string $from, ?string $to, string $mode = 'daily'): array
+    {
+        [$selectDate, $groupDate] = match ($mode) {
+            'weekly' => [
+                DB::raw("strftime('%Y-W%W', created_at) as date"),
+                DB::raw("strftime('%Y-W%W', created_at)"),
+            ],
+            'monthly' => [
+                DB::raw("strftime('%Y-%m', created_at) as date"),
+                DB::raw("strftime('%Y-%m', created_at)"),
+            ],
+            default => [
                 DB::raw("DATE(created_at) as date"),
-                DB::raw('COUNT(*) as order_count'),
-                DB::raw('COALESCE(SUM(total), 0) as revenue')
-            )
+                DB::raw("DATE(created_at)"),
+            ],
+        };
+
+        return Order::query()
+            ->select($selectDate, DB::raw('COUNT(*) as order_count'), DB::raw('COALESCE(SUM(total), 0) as revenue'))
             ->when($from, fn($q) => $q->whereDate('created_at', '>=', $from))
             ->when($to,   fn($q) => $q->whereDate('created_at', '<=', $to))
-            ->groupBy(DB::raw("DATE(created_at)"))
+            ->groupBy($groupDate)
             ->orderBy('date')
             ->get()
             ->toArray();

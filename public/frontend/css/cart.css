@@ -1,0 +1,137 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--Backgroundcolor) !important;
+    /* حل مشكلة تداخل العناصر تحت الـ Fixed Navbar */
+    padding-top: 120px; 
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+:root {
+    --Primary: #2563EB;
+    --Secondary: #0F172A;
+    --Accent: #06B6D4;
+    --Success: #22C55E;
+    --Warning: #F59E0B;
+    --Danger: #EF4444;
+    --Backgroundcolor: #F8FAFC;
+    --DarkBackground: #020617;
+}
+
+/* Empty Cart View Styling */
+#emptycart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 65vh;
+}
+
+#emptycart .card {
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+#emptycart h3 {
+    font-weight: 700;
+    color: var(--Secondary);
+}
+
+.text-light-gray {
+    color: #cbd5e1;
+}
+
+/* Cart Structure Details */
+.cartheader h1 {
+    font-size: 2rem;
+    color: var(--Secondary);
+}
+
+.card {
+    border: none;
+    background: #ffffff;
+    box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+/* Product Responsive Row Style */
+.cart-item-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cart-item-card:hover {
+    box-shadow: 0 6px 24px rgba(15, 23, 42, 0.07);
+}
+
+.productprice {
+    color: var(--Primary);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.delete {
+    transition: color 0.2s ease;
+}
+.delete:hover {
+    color: var(--Danger) !important;
+}
+
+/* Quantity Control Widget */
+.quantity {
+    display: inline-flex;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f8fafc;
+    overflow: hidden;
+}
+.quantity button {
+    padding: 6px 12px;
+    background: transparent;
+    transition: background-color 0.2s;
+}
+.quantity button:hover {
+    background-color: #cbd5e1;
+}
+
+/* Summary Box Alignment */
+.ordersummary {
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+}
+
+.subtotal, .Shipping, .total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Checkoutbtn {
+    background-color: var(--Primary);
+    border: none !important;
+    transition: opacity 0.2s;
+}
+.Checkoutbtn:hover {
+    opacity: 0.9;
+    background-color: var(--Primary);
+}
+
+/* Responsive Overrides */
+@media (max-width: 991.98px) {
+    body {
+        padding-top: 100px;
+    }
+    .ordersummary {
+        margin-top: 20px;
+        position: static !important;
+    }
+    .rightside {
+        flex-direction: row-reverse !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        border-top: 1px solid #f1f5f9;
+        margin-top: 10px;
+        padding-top: 15px !important;
+        min-height: auto !important;
+    }
+}

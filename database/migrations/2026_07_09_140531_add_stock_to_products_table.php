@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -12,7 +13,12 @@ return new class extends Migration
             $table->integer('stock')->default(0)->after('base_price');
         });
 
-        DB::statement("UPDATE products SET stock = CASE WHEN in_stock = 1 THEN 10 ELSE 0 END WHERE stock = 0");
+        // Use Query Builder instead of raw SQL
+        DB::table('products')
+            ->where('stock', 0)
+            ->update([
+                'stock' => DB::raw('CASE WHEN in_stock = 1 THEN 10 ELSE 0 END')
+            ]);
     }
 
     public function down(): void

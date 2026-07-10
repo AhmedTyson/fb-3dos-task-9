@@ -1,0 +1,227 @@
+body{
+    font-family: 'Inter', sans-serif;
+    padding-top: 90px;
+}
+
+.card-img-top {
+    transition: filter 0.3s ease;
+    cursor: pointer;
+}
+
+.card:hover .card-img-top {
+    filter: brightness(1.5);
+}
+
+/* footer */
+.footer-section {
+    background-color: #1c1b1c;
+    padding: 60px 0 20px;
+    border-top: 2px solid #2563EB ;
+}
+
+.footer-logo {
+    color: #2563EB  !important;
+    font-weight: bold;
+}
+
+.footer-title {
+    color: #2563EB  !important;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.footer-section ul li {
+    margin-bottom: 12px;
+}
+
+.footer-section ul li a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.footer-section ul li a:hover {
+    color: #2563EB ;
+    padding-left: 5px;
+}
+
+.social-links a {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(195, 159, 33, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: #2563EB ;
+    text-decoration: none;
+    transition: 0.4s;
+}
+
+.social-links a:hover {
+    background-color: #2563EB ;
+    color: #032920;
+    transform: translateY(-5px);
+}
+
+.footer-divider {
+    border-color: #2563EB ;
+    margin-top: 40px;
+}
+
+/* dark  */
+
+
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+body.dark-mode .navbar {
+    background-color: #1e1e1e !important;
+}
+
+body.dark-mode .navbar-brand {
+    color: #4dabf7 !important;
+}
+
+body.dark-mode .nav-link {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .nav-link.text-primary {
+    color: #4dabf7 !important;
+}
+
+body.dark-mode .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+body.dark-mode .text-secondary {
+    color: #a0a0a0 !important;
+}
+
+body.dark-mode .text-dark {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .bg-light {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0;
+}
+
+body.dark-mode .bg-white {
+    background-color: #1e1e1e !important;
+}
+
+body.dark-mode .card {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+}
+
+body.dark-mode .card.shadow-sm {
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-mode .border:not(.border-primary) {
+    border-color: #444 !important;
+}
+
+body.dark-mode .img-thumbnail {
+    background-color: #1e1e1e;
+    border-color: #444;
+}
+
+body.dark-mode .img-thumbnail.border-primary {
+    border-color: var(--bs-primary) !important;
+}
+
+body.dark-mode .nav-tabs .nav-link {
+    color: #a0a0a0;
+}
+
+body.dark-mode .nav-tabs .nav-link.active {
+    color: #4dabf7 !important;
+    background-color: transparent;
+}
+
+body.dark-mode .form-control {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-color: #333;
+}
+
+body.dark-mode .btn-outline-secondary {
+    color: #e0e0e0;
+    border-color: #444;
+}
+
+body.dark-mode .btn-outline-secondary:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+body.dark-mode .badge.text-bg-primary {
+    background-color: #4dabf7 !important;
+    color: #121212 !important;
+}
+
+body.dark-mode .bg-primary-subtle {
+    background-color: #2a3b4d !important;
+    color: #4dabf7 !important;
+}
+
+
+
+
+
+
+
+
+/* hidden details */
+.product-thumb {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.product-thumb img {
+    width: 100%;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.product-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.product-thumb:hover .product-overlay,
+.product-thumb:active .product-overlay {
+    opacity: 1;
+}
+
+.product-thumb:hover img {
+    transform: scale(1.05);
+}
+
+.overlay-price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.overlay-desc {
+    font-size: 0.85rem;
+    margin-bottom: 0;
+}

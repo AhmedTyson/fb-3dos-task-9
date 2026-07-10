@@ -1,507 +1,373 @@
-document.addEventListener("DOMContentLoaded", function () {
+/**
+ * Admin Module - Admin panel functionality
+ * No ES modules - plain JavaScript for browser compatibility
+ */
+const Admin = {
+    chart: null,
+    currentChartMode: 'daily',
 
-    const API_BASE = window.location.origin + "/api";
-
-    // --- SECURE FETCH WRAPPER ---
-    async function adminFetch(endpoint, options = {}) {
-        const token = localStorage.getItem("admin_token");
-        if (!token) {
-            window.location.href = "login.html";
+    init() {
+        if (!AdminAuth.isAdmin()) {
+            window.location.href = '../frontend/login.html';
             return;
         }
 
-        const defaultHeaders = {
-            "Authorization": `Bearer ${token}`,
-            "Accept": "application/json",
-            "ngrok-skip-browser-warning": "true"
-        };
+        this.loadUsers();
+        this.loadOrders();
+        this.loadSalesReport();
+        this.loadAdminInfo();
+        this.initLogout();
+        this.initExportButtons();
+        this.initChartModeButtons();
+    },
 
-        if (!(options.body instanceof FormData)) {
-            defaultHeaders["Content-Type"] = "application/json";
+    initChartModeButtons() {
+        document.querySelectorAll('[data-chart-mode]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const mode = btn.getAttribute('data-chart-mode');
+                if (!mode || mode === this.currentChartMode) return;
+                this.currentChartMode = mode;
+                // Toggle active class
+                document.querySelectorAll('[data-chart-mode]').forEach(b => {
+                    b.classList.remove('btn-primary');
+                    b.classList.add('btn-outline-secondary');
+                });
+                btn.classList.remove('btn-outline-secondary');
+                btn.classList.add('btn-primary');
+                this.loadSalesReport();
+            });
+        });
+    },
+
+    initLogout() {
+        document.querySelectorAll('.admin-logout-btn, #adminLogoutBtn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                AdminAuth.logout();
+            });
+        });
+    },
+
+    async loadAdminInfo() {
+        const user = await AdminAuth.getUser();
+        if (user) {
+            const nameEl = document.querySelector('.user-profile h6');
+            const emailEl = document.querySelector('.user-profile small');
+            if (nameEl) nameEl.textContent = user.name || 'Admin';
+            if (emailEl) emailEl.textContent = user.email || '';
         }
+    },
 
-        options.headers = { ...defaultHeaders, ...options.headers };
-
+    async loadUsers() {
         try {
-            const response = await fetch(`${API_BASE}${endpoint}`, options);
-            if (response.status === 401 || response.status === 403) {
-                localStorage.removeItem("admin_token");
-                window.location.href = "login.html";
-                return;
-            }
-            return response;
+            const response = await fetch(`${AdminAuth.getBaseUrl()}/admin/users`, {
+                method: 'GET',
+                headers: AdminAuth.getHeaders()
+            });
+            if (!response.ok) throw new Error('Failed to load users');
+            const data = await response.json();
+            this.renderUsers(data.data);
         } catch (error) {
-            console.error("Fetch Error:", error);
-            throw error;
+            console.error('Failed to load users:', error);
         }
-    }
+    },
 
-    const currencyFmt = new Intl.NumberFormat('en-EG', { style: 'currency', currency: 'EGP' });
-    const numberFmt = new Intl.NumberFormat('en-US');
-
-    // Unwrap cache middleware wrapper { message, source, data: actual }
-    function unwrap(resp) {
-        if (resp && typeof resp === 'object' && 'data' in resp && ('items' in resp.data || 'data' in resp.data || 'total_revenue' in resp.data)) {
-            return resp.data;
-        }
-        return resp;
-    }
-
-    function timeAgo(dateStr) {
-        const now = new Date();
-        const then = new Date(dateStr);
-        const sec = Math.floor((now - then) / 1000);
-        if (sec < 60) return 'just now';
-        const min = Math.floor(sec / 60);
-        if (min < 60) return min + ' min ago';
-        const hr = Math.floor(min / 60);
-        if (hr < 24) return hr + 'h ago';
-        const days = Math.floor(hr / 24);
-        return days + 'd ago';
-    }
-
-    function getWeekNumber(date) {
-        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-        return d.getUTCFullYear() + '-W' + String(weekNo).padStart(2, '0');
-    }
-
-    // --- PHASE 4-5: LOAD KPIs ---
-    async function loadDashboardKPIs() {
-        const salesEl = document.getElementById("kpi-total-sales");
-        const ordersEl = document.getElementById("kpi-total-orders");
-        const customersEl = document.getElementById("kpi-total-customers");
-
-        // Fetch sales report separately
+    async loadOrders() {
         try {
-            const reportRes = await adminFetch("/admin/reports/sales?format=json");
-            if (reportRes && reportRes.ok) {
-                const reportData = await reportRes.json();
-                const d = unwrap(reportData);
-                if (d) {
-                    if (salesEl) salesEl.innerText = currencyFmt.format(d.total_revenue || 0);
-                    if (ordersEl) ordersEl.innerText = numberFmt.format(d.total_orders || 0);
-                    if (d.daily_breakdown) window._dailyData = d.daily_breakdown;
-                    if (d.best_sellers) window._bestSellers = d.best_sellers;
-                } else {
-                    if (salesEl) salesEl.innerText = "0";
-                    if (ordersEl) ordersEl.innerText = "0";
-                }
-            } else {
-                if (salesEl) salesEl.innerText = "0";
-                if (ordersEl) ordersEl.innerText = "0";
-            }
-        } catch (e) {
-            console.error("Sales report fetch failed:", e);
-            if (salesEl) salesEl.innerText = "0";
-            if (ordersEl) ordersEl.innerText = "0";
+            const response = await fetch(`${AdminAuth.getBaseUrl()}/admin/orders?per_page=20`, {
+                method: 'GET',
+                headers: AdminAuth.getHeaders()
+            });
+            if (!response.ok) throw new Error('Failed to load orders');
+            const data = await response.json();
+            const orders = data?.data?.items || [];
+            this.renderOrders(orders);
+            this.renderPendingShipments(orders);
+            this.renderRecentActivity(orders);
+        } catch (error) {
+            console.error('Failed to load orders:', error);
         }
+    },
 
-        // Fetch customers separately
+    async loadSalesReport() {
         try {
-            const usersRes = await adminFetch("/admin/users?page=1&per_page=1");
-            if (usersRes && usersRes.ok) {
-                let totalCustomers = usersRes.headers.get("X-Pagination-Total-Count");
-                if (!totalCustomers) {
-                    const body = await usersRes.clone().json().catch(() => ({}));
-                    const unwrapped = unwrap(body);
-                    totalCustomers = unwrapped?.pagination?.total || unwrapped?.meta?.total || body?.data?.pagination?.total || body?.data?.meta?.total || "0";
-                }
-                if (customersEl) customersEl.innerText = numberFmt.format(parseInt(totalCustomers));
-            } else {
-                if (customersEl) customersEl.innerText = "0";
-            }
-        } catch (e) {
-            console.error("Users fetch failed:", e);
-            if (customersEl) customersEl.innerText = "0";
+            const url = `${AdminAuth.getBaseUrl()}/admin/reports/sales?mode=${this.currentChartMode}`;
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: AdminAuth.getHeaders()
+            });
+            if (!response.ok) throw new Error('Failed to load sales report');
+            const data = await response.json();
+            this.renderSalesReport(data.data);
+        } catch (error) {
+            console.error('Failed to load sales report:', error);
         }
-    }
+    },
 
-    // --- PHASE 8: BEST SELLERS ---
-    function renderBestSellers(products) {
-        const container = document.getElementById('bestSellersContainer');
-        if (!container) return;
-        if (!products || products.length === 0) {
-            container.innerHTML = '<div class="col-12 text-center text-muted py-4">No sales data yet</div>';
-            return;
-        }
-        const emojis = ['🏆', '🥈', '🥉', '📦', '📦', '📦', '📦', '📦', '📦', '📦'];
-        const bgClasses = ['p-bg-1','p-bg-2','p-bg-3','p-bg-4','p-bg-5','p-bg-1','p-bg-2','p-bg-3','p-bg-4','p-bg-5'];
-        const maxSold = products[0].units_sold || 1;
-        container.innerHTML = products.slice(0, 10).map((p, i) => {
-            const pct = ((p.units_sold || 0) / maxSold * 100).toFixed(0);
-            const rawImg = (p.images && p.images[0]) ? p.images[0] : null;
-            // Strip leading /storage/ or storage/ to prevent double path
-            const cleanPath = rawImg ? rawImg.replace(/^\/?storage\//, '') : null;
-            const imgSrc = cleanPath ? `/api/storage/${cleanPath}` : null;
-            const fallbackEl = emojis[i] || '📦';
-            return `<div class="col product-item text-center">
-                <div class="product-img mb-2 d-flex align-items-center justify-content-center ${bgClasses[i % bgClasses.length]} position-relative loading">
-                    ${imgSrc ? `<img src="${imgSrc}" alt="${p.name}" loading="lazy" onerror="this.closest('.product-img').innerHTML='${fallbackEl}';this.closest('.product-img').classList.remove('loading')" onload="this.closest('.product-img').classList.remove('loading')" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">` : fallbackEl}
-                    <span class="position-absolute top-0 start-0 badge bg-dark bg-opacity-75 rounded-circle" style="font-size:0.6rem;width:22px;height:22px;display:flex;align-items:center;justify-content:center">${i + 1}</span>
-                </div>
-                <h6 class="m-0 text-truncate" style="font-size:0.8rem">${p.name}</h6>
-                <small class="text-muted d-block" style="font-size:0.75rem">${numberFmt.format(p.units_sold || 0)} sold</small>
-                <div class="progress mt-1" style="height:4px"><div class="progress-bar" style="width:${pct}%"></div></div>
-                <span class="text-primary fw-bold" style="font-size:0.75rem">${currencyFmt.format(p.total_revenue || 0)}</span>
-            </div>`;
-        }).join('');
-    }
+    renderUsers(users) {
+        const tbody = document.getElementById('users-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        users.forEach(user => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="px-3 py-3"><span class="fw-bold text-primary">#${user.id}</span></td>
+                <td class="px-3 py-3">${user.name}</td>
+                <td class="px-3 py-3">${user.email}</td>
+                <td class="px-3 py-3">
+                    <span class="badge ${user.role === 'admin' ? 'bg-primary' : 'bg-secondary'} rounded-pill px-3 py-2">${user.role}</span>
+                </td>
+                <td class="px-3 py-3">${user.orders_count || 0}</td>
+                <td class="px-3 py-3 text-secondary">${user.created_at ? new Date(user.created_at).toLocaleDateString() : '-'}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    },
 
-    // --- PHASE 9: RECENT ACTIVITY ---
-    async function loadRecentActivity() {
-        const container = document.getElementById('recentActivityContainer');
-        if (!container) return;
-        try {
-            const [ordersRes, usersRes, productsRes] = await Promise.all([
-                adminFetch("/admin/orders?per_page=1"),
-                adminFetch("/admin/users?per_page=1"),
-                fetch(`${API_BASE}/products?per_page=1&sort=newest`, { headers: { "ngrok-skip-browser-warning": "true", "Accept": "application/json" } })
-            ]);
+    renderOrders(orders) {
+        const tbody = document.getElementById('orders-tbody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        orders.forEach(order => {
+            const status = (order.status || 'pending').toLowerCase();
+            const badgeMap = {
+                'delivered': 'bg-success-subtle text-success',
+                'completed': 'bg-success-subtle text-success',
+                'shipped':   'bg-info-subtle text-info',
+                'cancelled': 'bg-danger-subtle text-danger',
+            };
+            const badgeClass = badgeMap[status] || 'bg-warning-subtle text-warning';
+            const badgeLabel = status === 'pending' ? 'Pending' :
+                               status === 'approved' ? 'Approved' :
+                               status.charAt(0).toUpperCase() + status.slice(1);
+            const statusBadge = `<span class="badge ${badgeClass} rounded-pill px-3 py-2"><i class="fa-solid fa-circle me-1 fs-6 align-middle ${status === 'shipped' ? 'fa-pulse' : ''}"></i>${badgeLabel}</span>`;
 
-            let items = [];
+            const firstItem = order.items && order.items[0];
+            const imgSrc = firstItem?.product?.image_url || firstItem?.product?.thumbnail || '';
+            const imageUrl = imgSrc
+                ? (imgSrc.startsWith('http') ? imgSrc : (imgSrc.startsWith('/') ? imgSrc : '/' + imgSrc))
+                : 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=150&q=80';
 
-            if (ordersRes && ordersRes.ok) {
-                const d = unwrap(await ordersRes.clone().json().catch(() => ({})));
-                const data = d.items || d.data || [];
-                if (data.length) {
-                    const o = data[0];
-                    items.push({ type: 'order', text: `Order #${o.id} placed by <b>${o.customer_name || o.customer_email || 'Customer'}</b>`, time: o.created_at, icon: 'fa-cart-plus', color: 'primary' });
-                }
-            }
-            if (usersRes && usersRes.ok) {
-                const d = unwrap(await usersRes.clone().json().catch(() => ({})));
-                const data = d.data || d.items || [];
-                if (data.length) {
-                    const u = data[0];
-                    items.push({ type: 'user', text: `New customer registered: <b>${u.name || 'Unknown'}</b>`, time: u.created_at, icon: 'fa-user-plus', color: 'warning' });
-                }
-            }
-            if (productsRes && productsRes.ok) {
-                const d = await productsRes.clone().json().catch(() => ({}));
-                const payload = d.data || d;
-                const data = payload.data || payload.items || [];
-                if (data.length) {
-                    const p = data[0];
-                    items.push({ type: 'product', text: `Product added: <b>${p.name || 'Unknown'}</b>`, time: p.created_at, icon: 'fa-box-open', color: 'success' });
-                }
-            }
-
-            items.sort((a, b) => new Date(b.time) - new Date(a.time));
-
-            if (items.length === 0) {
-                container.innerHTML = '<div class="text-muted text-center py-3">No recent activity</div>';
-                return;
-            }
-
-            container.innerHTML = items.slice(0, 5).map(item =>
-                `<div class="d-flex gap-3 activity-item">
-                    <div class="activity-dot bg-${item.color}-subtle text-${item.color}"><i class="fa-solid ${item.icon}"></i></div>
-                    <div>
-                        <p class="m-0 text-muted" style="font-size:0.85rem">${item.text}</p>
-                        <small class="text-muted" style="font-size:0.75rem">${timeAgo(item.time)}</small>
+            const row = document.createElement('tr');
+            row.style.cursor = 'pointer';
+            row.innerHTML = `
+                <td class="px-3 py-3">
+                    <span class="fw-bold text-primary">#LG-${order.id}-X</span>
+                </td>
+                <td class="px-3 py-3 text-secondary">${new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</td>
+                <td class="px-3 py-3">
+                    <div class="d-flex align-items-center">
+                        <div class="rounded border overflow-hidden bg-light" style="width: 40px; height: 40px;">
+                            <img class="w-100 h-100 object-fit-cover" src="${imageUrl}" alt="Product" />
+                        </div>
+                        ${(order.items?.length > 1) ? `
+                        <div class="rounded border bg-secondary-subtle text-dark d-flex align-items-center justify-content-center fw-medium" style="width: 40px; height: 40px; margin-left: -10px; z-index: 2; border: 2px solid #fff !important; font-size: 12px;">
+                            +${order.items.length - 1}
+                        </div>` : ''}
                     </div>
-                </div>`
-            ).join('');
-        } catch (e) {
-            container.innerHTML = '<div class="text-muted text-center py-3">Failed to load activity</div>';
-        }
-    }
+                </td>
+                <td class="px-3 py-3">${statusBadge}</td>
+                <td class="px-3 py-3 fw-bold">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(order.total || order.total_amount || 0)}</td>
+                <td class="px-3 py-3 text-end"></td>
+            `;
+            tbody.appendChild(row);
+        });
+    },
 
-    // --- PHASE 10: PENDING SHIPMENTS ---
-    async function loadPendingShipments() {
+    renderPendingShipments(orders) {
         const tbody = document.getElementById('pendingShipmentsTbody');
         if (!tbody) return;
-        try {
-            const res = await adminFetch("/admin/orders?status=approved&per_page=5");
-            if (!res || !res.ok) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Failed to load</td></tr>';
-                return;
-            }
-            const d = unwrap(await res.json());
-            const orders = d.items || d.data || [];
-
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">No pending shipments</td></tr>';
-                return;
-            }
-
-            tbody.innerHTML = orders.map(o => {
-                const addr = o.shipping_address || {};
-                const city = addr.city || addr.address || '';
-                const itemsCount = o.items_count || o.items?.length || 'N/A';
-                return `<tr>
-                    <td class="fw-bold">#${o.id}</td>
-                    <td>${o.customer_name || o.customer_email || 'N/A'}</td>
-                    <td>${city}</td>
-                    <td>${itemsCount} item(s)</td>
-                    <td><span class="status-badge status-processing">${o.status || 'Pending'}</span></td>
-                    <td class="text-end">
-                        <button class="btn btn-sm btn-outline-primary print-order-btn" data-order-id="${o.id}" title="Print Invoice">
-                            <i class="fa-solid fa-print"></i>
-                        </button>
-                    </td>
-                </tr>`;
-            }).join('');
-
-            // Attach print handlers
-            tbody.querySelectorAll('.print-order-btn').forEach(btn => {
-                btn.addEventListener('click', async function() {
-                    const orderId = this.dataset.orderId;
-                    try {
-                        const printRes = await adminFetch(`/admin/orders/${orderId}/print-file`);
-                        if (printRes && printRes.ok) {
-                            const blob = await printRes.blob();
-                            const url = window.URL.createObjectURL(blob);
-                            window.open(url, '_blank');
-                            setTimeout(() => window.URL.revokeObjectURL(url), 60000);
-                        } else {
-                            alert('Failed to generate print file');
-                        }
-                    } catch (e) {
-                        alert('Network error printing order');
-                    }
-                });
+        const pendingStatuses = ['pending', 'approved', 'processing', 'shipped'];
+        const pending = orders.filter(o => pendingStatuses.includes((o.status || '').toLowerCase()));
+        if (pending.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">All orders processed</td></tr>';
+            return;
+        }
+        tbody.innerHTML = '';
+        pending.slice(0, 5).forEach(order => {
+            const row = document.createElement('tr');
+            const customerName = order.user?.name || order.customer_name || 'N/A';
+            const dest = order.shipping_address;
+            const destination = typeof dest === 'string' ? dest : (dest?.city ? `${dest.city}, ${dest.country || ''}` : 'N/A');
+            const itemCount = order.items_count || order.items?.length || 0;
+            row.innerHTML = `
+                <td><span class="fw-bold text-primary">#LG-${order.id}-X</span></td>
+                <td>${customerName}</td>
+                <td class="text-muted">${destination.substring(0, 30)}</td>
+                <td>${itemCount} item${itemCount !== 1 ? 's' : ''}</td>
+                <td>${order.status || 'Processing'}</td>
+                <td class="text-end"><button class="btn btn-sm btn-outline-primary download-pdf-btn" data-order-id="${order.id}" title="Download invoice PDF"><i class="fa-solid fa-file-pdf me-1"></i>PDF</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+        // Attach PDF download via event delegation on tbody (once)
+        if (!tbody.dataset.pdfAttached) {
+            tbody.dataset.pdfAttached = '1';
+            tbody.addEventListener('click', (e) => {
+                const btn = e.target.closest('.download-pdf-btn');
+                if (!btn) return;
+                const orderId = btn.getAttribute('data-order-id');
+                if (!orderId) return;
+                this.downloadPendingPdf(orderId, btn);
             });
-        } catch (e) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">Error loading data</td></tr>';
         }
-    }
+    },
 
-    // --- PHASE 11: SALES VS ORDERS CHART ---
-    let salesChartInstance = null;
-    let currentChartMode = 'daily';
+    async downloadPendingPdf(orderId, btn) {
+        btn.disabled = true;
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>';
+        try {
+            const res = await fetch(`${AdminAuth.getBaseUrl()}/admin/orders/${orderId}/print-file`, {
+                headers: AdminAuth.getHeaders()
+            });
+            if (!res.ok) {
+                const errBody = await res.json().catch(() => ({}));
+                throw new Error(errBody.message || `HTTP ${res.status}`);
+            }
+            const blob = await res.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `order-${orderId}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (err) {
+            console.error('PDF download failed:', err);
+            alert('PDF download failed: ' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = orig;
+        }
+    },
 
-    function renderChart(dailyData, mode) {
+    initExportButtons() {
+        const pdfBtn = document.getElementById('exportPdfBtn');
+        const excelBtn = document.getElementById('exportExcelBtn');
+        if (pdfBtn) pdfBtn.addEventListener('click', (e) => { e.preventDefault(); this.downloadReport('pdf'); });
+        if (excelBtn) excelBtn.addEventListener('click', (e) => { e.preventDefault(); this.downloadReport('xlsx'); });
+    },
+
+    async downloadReport(format) {
+        const from = document.getElementById('reportFromDate')?.value || '';
+        const to = document.getElementById('reportToDate')?.value || '';
+        const params = new URLSearchParams({ format, from, to });
+        const url = `${AdminAuth.getBaseUrl()}/admin/reports/sales?${params}`;
+        try {
+            const res = await fetch(url, { headers: AdminAuth.getHeaders() });
+            if (!res.ok) {
+                const errBody = await res.json().catch(() => ({}));
+                throw new Error(errBody.message || `HTTP ${res.status}`);
+            }
+            const blob = await res.blob();
+            const ext = format === 'pdf' ? 'pdf' : 'xlsx';
+            const blobUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = `sales-report.${ext}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (err) {
+            console.error('Report download failed:', err);
+            alert('Download failed: ' + err.message);
+        }
+    },
+
+    renderRecentActivity(orders) {
+        const container = document.getElementById('recentActivityContainer');
+        if (!container) return;
+        if (!orders || orders.length === 0) {
+            container.innerHTML = '<div class="text-muted small">No recent activity.</div>';
+            return;
+        }
+        container.innerHTML = '';
+        orders.slice(0, 5).forEach(order => {
+            const name = order.user?.name || order.customer_name || 'Customer';
+            const status = order.status || 'Processing';
+            const date = order.created_at ? new Date(order.created_at).toLocaleDateString() : '';
+            const div = document.createElement('div');
+            div.className = 'd-flex align-items-center gap-2';
+            div.innerHTML = `
+                <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">
+                    <i class="fa-solid fa-cart-shopping" style="font-size: 12px;"></i>
+                </div>
+                <div class="small flex-grow-1">
+                    <strong>${name}</strong> placed order <span class="text-primary fw-medium">#LG-${order.id}-X</span>
+                    <div class="text-muted" style="font-size: 11px;">${date} &middot; ${status}</div>
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    },
+
+    renderChart(report) {
         const canvas = document.getElementById('salesChart');
-        if (!canvas) return;
-        if (!dailyData || dailyData.length === 0) return;
-
-        mode = mode || 'daily';
-
-        let labels, revenueData, orderData;
-
-        if (mode === 'daily') {
-            // Last 7 days
-            const last7 = [];
-            const today = new Date();
-            for (let i = 6; i >= 0; i--) {
-                const d = new Date(today);
-                d.setDate(d.getDate() - i);
-                const key = d.toISOString().slice(0, 10);
-                const found = dailyData.find(x => x.date === key);
-                last7.push({
-                    date: key,
-                    revenue: found ? parseFloat(found.revenue) : 0,
-                    order_count: found ? parseInt(found.order_count) : 0
-                });
-            }
-            labels = last7.map(d => d.date.slice(5));
-            revenueData = last7.map(d => d.revenue);
-            orderData = last7.map(d => d.order_count);
-        } else if (mode === 'weekly') {
-            // Last 4 ISO weeks, fill missing with 0
-            const today = new Date();
-            const last4 = [];
-            for (let i = 3; i >= 0; i--) {
-                const d = new Date(today);
-                d.setDate(d.getDate() - i * 7);
-                const wk = getWeekNumber(d);
-                let rev = 0, ord = 0;
-                dailyData.forEach(x => {
-                    const xd = new Date(x.date + 'T00:00:00');
-                    if (getWeekNumber(xd) === wk) {
-                        rev += parseFloat(x.revenue) || 0;
-                        ord += parseInt(x.order_count) || 0;
-                    }
-                });
-                last4.push({ week: wk, revenue: rev, order_count: ord });
-            }
-            labels = last4.map(d => d.week);
-            revenueData = last4.map(d => d.revenue);
-            orderData = last4.map(d => d.order_count);
-        } else if (mode === 'monthly') {
-            // Last 6 months, fill missing with 0
-            const today = new Date();
-            const last6 = [];
-            for (let i = 5; i >= 0; i--) {
-                const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
-                const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-                let rev = 0, ord = 0;
-                dailyData.forEach(x => {
-                    if (x.date.slice(0, 7) === key) {
-                        rev += parseFloat(x.revenue) || 0;
-                        ord += parseInt(x.order_count) || 0;
-                    }
-                });
-                last6.push({ month: key, revenue: rev, order_count: ord });
-            }
-            labels = last6.map(d => d.month);
-            revenueData = last6.map(d => d.revenue);
-            orderData = last6.map(d => d.order_count);
-        }
-
-        if (salesChartInstance) salesChartInstance.destroy();
-
-        const ctx = canvas.getContext('2d');
-        salesChartInstance = new Chart(ctx, {
+        if (!canvas || !report.daily_breakdown || report.daily_breakdown.length === 0) return;
+        const labels = report.daily_breakdown.map(d => d.date?.substring(5) || '');
+        const revenue = report.daily_breakdown.map(d => d.revenue || 0);
+        const orders = report.daily_breakdown.map(d => d.order_count || d.orders || 0);
+        if (this.chart) this.chart.destroy();
+        this.chart = new Chart(canvas, {
             type: 'line',
             data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Revenue (EGP)',
-                    data: revenueData,
-                    borderColor: '#0d6efd',
-                    backgroundColor: 'rgba(13,110,253,0.1)',
-                    fill: true,
-                    tension: 0.3,
-                    yAxisID: 'y'
-                }, {
-                    label: 'Orders',
-                    data: orderData,
-                    borderColor: '#198754',
-                    backgroundColor: 'rgba(25,135,84,0.1)',
-                    fill: true,
-                    tension: 0.3,
-                    yAxisID: 'y1'
-                }]
+                labels,
+                datasets: [
+                    { label: 'Revenue (EGP)', data: revenue, borderColor: '#0d6efd', backgroundColor: 'rgba(13,110,253,0.1)', yAxisID: 'y', tension: 0.3, fill: true },
+                    { label: 'Order Count', data: orders, borderColor: '#198754', backgroundColor: 'rgba(25,135,84,0.1)', yAxisID: 'y1', tension: 0.3, fill: true }
+                ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 interaction: { mode: 'index', intersect: false },
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        beginAtZero: true,
-                        ticks: { callback: v => currencyFmt.format(v) }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        beginAtZero: true,
-                        grid: { drawOnChartArea: false },
-                        ticks: { precision: 0 }
-                    }
+                    y: { type: 'linear', position: 'left', beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                    y1: { type: 'linear', position: 'right', beginAtZero: true, grid: { display: false } }
                 }
             }
         });
-    }
+    },
 
-    // Chart mode toggle handlers
-    document.querySelectorAll('[data-chart-mode]').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const mode = this.dataset.chartMode;
-            if (mode === currentChartMode || !window._dailyData) return;
-            currentChartMode = mode;
-            document.querySelectorAll('[data-chart-mode]').forEach(b => {
-                b.classList.toggle('btn-primary', b === this);
-                b.classList.toggle('btn-outline-secondary', b !== this);
+    renderSalesReport(report) {
+        // Update KPI cards (HTML IDs: kpi-total-orders, kpi-total-sales, kpi-total-customers)
+        const kpiEl = (id) => document.getElementById(id);
+        if (kpiEl('kpi-total-orders'))   kpiEl('kpi-total-orders').textContent   = report.total_orders || 0;
+        if (kpiEl('kpi-total-sales'))    kpiEl('kpi-total-sales').textContent    = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(report.total_revenue || 0);
+        if (kpiEl('kpi-total-customers')) kpiEl('kpi-total-customers').textContent = report.total_users || 0;
+
+        // Render sales chart
+        this.renderChart(report);
+
+        // Render best sellers as card grid
+        const container = document.getElementById('bestSellersContainer');
+        if (container && report.best_sellers && report.best_sellers.length > 0) {
+            container.innerHTML = '';
+            report.best_sellers.forEach(item => {
+                const imgUrl = (item.images && Array.isArray(item.images) && item.images[0])
+                    ? (item.images[0].startsWith('http') ? item.images[0] : '/storage/' + item.images[0].replace('/storage/', ''))
+                    : 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=150&q=80';
+                const card = document.createElement('div');
+                card.className = 'col';
+                card.innerHTML = `
+                    <div class="card h-100 border-0 shadow-sm text-center p-3" style="border-radius: 12px;">
+                        <img src="${imgUrl}" class="card-img-top mb-2" style="height: 100px; object-fit: contain;" alt="${item.name || ''}" />
+                        <div class="card-body p-0">
+                            <h6 class="fw-bold mb-1 text-truncate">${item.name || ''}</h6>
+                            <small class="text-muted">${item.units_sold || 0} sold</small>
+                            <div class="fw-bold text-primary mt-1">${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(item.total_revenue || 0)}</div>
+                        </div>
+                    </div>`;
+                container.appendChild(card);
             });
-            renderChart(window._dailyData, mode);
-        });
-    });
-
-    // --- PHASE 6: REPORT EXPORT ---
-    const fromDateInput = document.getElementById('reportFromDate');
-    const toDateInput = document.getElementById('reportToDate');
-    const exportPdfBtn = document.getElementById('exportPdfBtn');
-    const exportExcelBtn = document.getElementById('exportExcelBtn');
-
-    async function downloadSalesReport(format) {
-        const fromDate = fromDateInput?.value;
-        const toDate = toDateInput?.value;
-
-        if (fromDate && toDate && new Date(fromDate) > new Date(toDate)) {
-            alert("Validation Error: 'From Date' cannot be after 'To Date'.");
-            return;
-        }
-
-        const params = new URLSearchParams();
-        if (fromDate) params.set('from', fromDate);
-        if (toDate) params.set('to', toDate);
-        params.set('format', format);
-
-        try {
-            const response = await adminFetch(`/admin/reports/sales?${params.toString()}`);
-            if (!response) return;
-
-            if (response.ok) {
-                const blob = await response.blob();
-                const blobUrl = window.URL.createObjectURL(blob);
-                const downloadAnchor = document.createElement('a');
-                downloadAnchor.href = blobUrl;
-                downloadAnchor.download = `sales-report-${fromDate || 'all'}-to-${toDate || 'all'}.${format}`;
-                document.body.appendChild(downloadAnchor);
-                downloadAnchor.click();
-                document.body.removeChild(downloadAnchor);
-                window.URL.revokeObjectURL(blobUrl);
-            } else if (response.status === 422) {
-                const errResult = await response.json();
-                alert(`Validation Failed (422): ${errResult.message}`);
-            } else if (response.status === 403) {
-                alert("Access Denied (403): You do not have Admin privileges.");
-            } else {
-                alert(`Server Error (${response.status}): Failed to generate report.`);
-            }
-        } catch (error) {
-            console.error("Report Export Error:", error);
-            alert("Network Error: Could not connect to the server.");
         }
     }
+};
 
-    if (exportPdfBtn) {
-        exportPdfBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            downloadSalesReport('pdf');
-        });
-    }
-    if (exportExcelBtn) {
-        exportExcelBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            downloadSalesReport('xlsx');
-        });
-    }
-
-    // --- INIT DASHBOARD ---
-    if (document.getElementById("kpi-total-sales")) {
-        loadDashboardKPIs().then(() => {
-            // After KPIs load, render Best Sellers + Chart from cached data
-            if (window._bestSellers && window._bestSellers.length > 0) renderBestSellers(window._bestSellers);
-            if (window._dailyData && window._dailyData.length > 0) renderChart(window._dailyData, currentChartMode);
-        });
-        loadRecentActivity();
-        loadPendingShipments();
-    }
-
-    // --- SIDEBAR TOGGLE ---
-    const sidebar = document.getElementById('sidebarMenu');
-    const toggleBtn = document.getElementById('menuToggleBtn');
-    const closeBtn = document.getElementById('closeSidebarBtn');
-    const overlay = document.getElementById('sidebarOverlay');
-    function openSidebar() {
-        if (sidebar) sidebar.classList.add('show');
-        if (overlay) overlay.classList.add('show');
-    }
-    function closeSidebar() {
-        if (sidebar) sidebar.classList.remove('show');
-        if (overlay) overlay.classList.remove('show');
-    }
-    if (toggleBtn) toggleBtn.addEventListener('click', openSidebar);
-    if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
-    if (overlay) overlay.addEventListener('click', closeSidebar);
-
-    // --- MINI BAR ANIMATION ---
-    setTimeout(() => {
-        document.querySelectorAll('.mini-bar').forEach(bar => {
-            const targetHeight = bar.getAttribute('data-height');
-            if (targetHeight) bar.style.height = targetHeight;
-        });
-    }, 500);
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    Admin.init();
 });

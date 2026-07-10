@@ -12,7 +12,7 @@ class ProductFactory extends Factory
     {
         $name = $this->faker->words(3, true);
         return [
-            'category_id' => Category::inRandomOrder()->value('id') ?? Category::factory(),
+            'category_id' => Category::inRandomOrder()->value('id'),
             'name' => $name,
             'description' => $this->faker->paragraph,
             'size' => $this->faker->randomElement(['S', 'M', 'L', 'XL', 'Standard', 'Compact', 'Full Size', '75%', 'One Size', '27 inch', '34 inch', '2m', 'Standard']),
@@ -23,5 +23,21 @@ class ProductFactory extends Factory
                 'https://picsum.photos/seed/' . Str::slug($name) . '/400/300.jpg',
             ],
         ];
+    }
+
+    public function inStock(): static
+    {
+        return $this->state(fn() => [
+            'in_stock' => true,
+            'stock' => fake()->numberBetween(20, 100),
+        ]);
+    }
+
+    public function outOfStock(): static
+    {
+        return $this->state(fn() => [
+            'in_stock' => false,
+            'stock' => 0,
+        ]);
     }
 }

@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", async function() {
-    const API_BASE = window.location.origin + "/api";
-    const token = localStorage.getItem("admin_token");
-    if (!token) { alert("Unauthorized!"); window.location.href = "login.html"; return; }
+    const API_BASE = window.API_CONFIG?.getBaseUrl() || window.location.origin + "/api";
+    const token = localStorage.getItem("token") || localStorage.getItem("admin_token");
+    if (!token) { alert("Unauthorized!"); window.location.href = "../frontend/login.html"; return; }
 
     const headers = {
         "Authorization": `Bearer ${token}`,

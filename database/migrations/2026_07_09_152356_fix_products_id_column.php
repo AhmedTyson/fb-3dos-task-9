@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -8,87 +9,75 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Disable FK checks temporarily (order_items FKs reference products but id lacks PK)
-        DB::statement("PRAGMA foreign_keys = OFF");
+        Schema::disableForeignKeyConstraints();
 
-        // 1. Backfill NULL ids with their SQLite rowids
-        DB::statement("UPDATE products SET id = rowid WHERE id IS NULL");
+        // 1. Create new table with correct schema using Schema builder
+        Schema::create('products_new', function (Blueprint $table) {
+            $table->id(); // INTEGER PRIMARY KEY AUTOINCREMENT
+            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
+            $table->string('name'); // index added via $table->index('name') below
+            $table->text('description');
+            $table->string('size', 50);
+            $table->decimal('base_price', 10, 2)->unsigned()->default(0);
+            $table->integer('stock')->default(0);
+            $table->boolean('in_stock')->default(false);
+            $table->json('images')->nullable();
+            $table->softDeletes();
+            $table->timestamps();
 
-        // 2. Recreate table with correct schema (id was INT not INTEGER PRIMARY KEY)
-        DB::statement("
-            CREATE TABLE products_new (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                category_id INTEGER NOT NULL,
-                name        TEXT    NOT NULL,
-                description TEXT    NOT NULL DEFAULT '',
-                size        TEXT,
-                base_price  REAL    NOT NULL DEFAULT 0,
-                stock       INTEGER NOT NULL DEFAULT 0,
-                in_stock    INTEGER NOT NULL DEFAULT 0,
-                images      TEXT,
-                deleted_at  TEXT,
-                created_at  TEXT,
-                updated_at  TEXT,
-                FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-            )
-        ");
+            $table->index('name');
+            $table->index('category_id');
+            $table->index('deleted_at');
+        });
 
-        // 3. Copy data
-        DB::statement("
-            INSERT INTO products_new (
-                id, category_id, name, description, size, base_price,
-                stock, in_stock, images, deleted_at, created_at, updated_at
-            ) SELECT
-                id, category_id, name, description, size, base_price,
-                stock, in_stock, images, deleted_at, created_at, updated_at
-            FROM products
-        ");
+        // 3. Copy data from old to new table
+        $columns = [
+            'id', 'category_id', 'name', 'description', 'size', 'base_price',
+            'stock', 'in_stock', 'images', 'deleted_at', 'created_at', 'updated_at'
+        ];
 
-        // 4. Create indexes on the new table before renaming
-        DB::statement("CREATE INDEX idx_products_name ON products_new(name)");
-        DB::statement("CREATE INDEX idx_products_category_id ON products_new(category_id)");
-        DB::statement("CREATE INDEX idx_products_deleted_at ON products_new(deleted_at)");
+        DB::table('products_new')->insert(
+            DB::table('products')->select($columns)->get()->toArray()
+        );
 
         // 5. Swap tables
-        DB::statement("DROP TABLE products");
-        DB::statement("ALTER TABLE products_new RENAME TO products");
+        Schema::drop('products');
+        Schema::rename('products_new', 'products');
 
-        // 6. Sync autoincrement sequence (after rename so new table's sequence is correct)
-        $maxId = DB::table('products')->max('id') ?? 1;
-        DB::statement("DELETE FROM sqlite_sequence WHERE name = 'products'");
-        DB::statement("INSERT INTO sqlite_sequence (name, seq) VALUES ('products', ?)", [$maxId]);
+        // 6. Sync autoincrement sequence (SQLite only)
+        if (DB::getDriverName() === 'sqlite') {
+            $maxId = DB::table('products')->max('id') ?? 1;
+            DB::statement("DELETE FROM sqlite_sequence WHERE name = 'products'");
+            DB::statement("INSERT INTO sqlite_sequence (name, seq) VALUES ('products', ?)", [$maxId]);
+        }
 
-        // Re-enable foreign keys (new table has proper PK so FKs will work)
-        DB::statement("PRAGMA foreign_keys = ON");
+        Schema::enableForeignKeyConstraints();
     }
 
     public function down(): void
     {
-        DB::statement("PRAGMA foreign_keys = OFF");
+        Schema::disableForeignKeyConstraints();
 
         // Restore old schema (id INT without primary key)
-        DB::statement("
-            CREATE TABLE products_old (
-                id          INT,
-                category_id INT,
-                name        TEXT,
-                description TEXT,
-                size        TEXT,
-                base_price  NUM,
-                stock       INT,
-                in_stock    INT,
-                images      TEXT,
-                deleted_at  NUM,
-                created_at  NUM,
-                updated_at  NUM
-            )
-        ");
+        Schema::create('products_old', function (Blueprint $table) {
+            $table->integer('id');
+            $table->integer('category_id');
+            $table->string('name');
+            $table->text('description');
+            $table->string('size', 50);
+            $table->decimal('base_price', 10, 2);
+            $table->integer('stock');
+            $table->boolean('in_stock');
+            $table->json('images')->nullable();
+            $table->softDeletes();
+            $table->timestamps();
+        });
 
-        DB::statement("
-            INSERT INTO products_old SELECT * FROM products
-        ");
+        DB::statement('INSERT INTO products_old SELECT * FROM products');
 
-        DB::statement("DROP TABLE products");
-        DB::statement("ALTER TABLE products_old RENAME TO products");
+        Schema::drop('products');
+        Schema::rename('products_old', 'products');
+
+        Schema::enableForeignKeyConstraints();
     }
 };

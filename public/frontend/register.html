@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>register</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="./css/register.css">
+</head>
+
+<body>
+
+    <div class="register">
+        <div class="icon">
+            <!-- <i class="fa-solid fa-user"></i> -->
+            <a href="#" class="home-link">
+                <i class="fa-solid fa-house"></i>
+                <span class="hover-text">Back to Home</span>
+            </a>
+            <button id="theme-toggle" class="theme-btn"><i class="fa-solid fa-moon"></i></button>
+        </div>
+        <h1>Create Account</h1>
+
+        <form>
+            <div class="input">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="Rana Hany" required>
+                <p id="nameMsg" class="error-msg d-none">Name must be between 3 and 20 characters (letters and numbers).
+                </p>
+
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="rana25@gmail.com" required>
+                <p id="emailMsg" class="error-msg d-none">Please enter a valid email address.</p>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+                <p id="passwordMsg" class="error-msg d-none">Password must be at least 8 characters long, containing an
+                    uppercase letter and a number.</p>
+
+                <label for="confpass">Confirm Password</label>
+                <input type="password" id="confpass" placeholder="••••••••" required>
+                <p id="confpassMsg" class="error-msg d-none">Passwords do not match.</p>
+            </div>
+
+            <div class="checkbox">
+                <input type="checkbox" id="check">
+                <label for="check">I agree to the <strong>terms & conditions</strong></label>
+            </div>
+
+            <button type="submit" class="submitBtn" id="register">Create Account</button>
+
+            <p class="login-link">Already have an account? <a href="login.html">Log in</a></p>
+        </form>
+    </div>
+
+    <script src="./js/config.js"></script>
+    <script src="./js/auth.js"></script>
+    <script src="./js/register.js"></script>
+    <script src="./js/theme.js"></script>
+
+</body>
+
+</html>

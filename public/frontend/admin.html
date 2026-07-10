@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel | LuxeGear</title>
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/sultan.css" />
+    <link rel="stylesheet" href="css/home.css" />
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg bg-white shadow-sm py-3 fixed-top">
+      <div class="container px-4">
+        <a class="navbar-brand fw-bold fs-3 text-primary" href="home.html">LuxeGear</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0 text-center">
+            <li class="nav-item">
+              <a class="nav-link text-secondary fw-medium mx-2" href="home.html">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-primary fw-bold mx-2" href="products.html">Products</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-secondary fw-medium mx-2" href="cart.html">Cart</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-secondary fw-medium mx-2" href="order.html">Orders</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-warning fw-bold mx-2" href="admin.html">Admin Panel</a>
+            </li>
+          </ul>
+
+          <div class="d-flex justify-content-center justify-content-lg-end align-items-center gap-3 mt-3 mt-lg-0">
+            <button class="btn btn-link fs-5 p-0" title="Account">
+              <i class="fa-solid fa-regular fa-user"></i>
+            </button>
+            <button class="btn btn-link fs-5 p-0" title="Dark Mode" id="darkModeBtn">
+              <i class="fa-solid fa-moon" id="moonIcon"></i>
+            </button>
+            <button class="btn btn-link fs-5 p-0" title="Cart">
+              <i class="fa-solid fa-cart-shopping"></i>
+            </button>
+            <button id="signOutBtn" class="btn btn-primary fw-semibold rounded-2 px-4" title="Sign Out">Sign Out</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container main-content mt-5 pt-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="display-6 fw-bold mb-1 text-dark">Admin Panel</h1>
+          <p class="mb-0 text-secondary">Manage users, orders, and products</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-outline-secondary d-flex align-items-center gap-1 px-3 py-2 rounded-3 fw-medium" id="refreshUsersBtn">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh Users
+          </button>
+          <button class="btn btn-outline-secondary d-flex align-items-center gap-1 px-3 py-2 rounded-3 fw-medium" id="refreshOrdersBtn">
+            <i class="fa-solid fa-arrows-rotate"></i> Refresh Orders
+          </button>
+        </div>
+      </div>
+
+      <!-- Users Section -->
+      <div class="card border-0 shadow-sm rounded-3 mb-5">
+        <div class="card-header bg-white border-0 pb-0">
+          <h2 class="h4 fw-bold mb-0">Users (<span id="usersCount">0</span>)</h2>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr class="table-header-row text-uppercase fs-7 text-secondary">
+                  <th class="px-3 py-3 fw-semibold">ID</th>
+                  <th class="px-3 py-3 fw-semibold">Name</th>
+                  <th class="px-3 py-3 fw-semibold">Email</th>
+                  <th class="px-3 py-3 fw-semibold">Role</th>
+                  <th class="px-3 py-3 fw-semibold">Orders</th>
+                  <th class="px-3 py-3 fw-semibold">Registered</th>
+                  <th class="px-3 py-3 fw-semibold text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="usersTbody">
+                <tr class="loading-row">
+                  <td colspan="7" class="p-5 text-center text-muted">Loading users...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      <!-- Orders Section -->
+      <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-header bg-white border-0 pb-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="h4 fw-bold mb-0">Recent Orders (<span id="ordersCount">0</span>)</h2>
+            <select id="orderStatusFilter" class="form-select form-select-sm w-auto" style="min-width: 180px;">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="shipped">Shipped</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr class="table-header-row text-uppercase fs-7 text-secondary">
+                  <th class="px-3 py-3 fw-semibold">Order #</th>
+                  <th class="px-3 py-3 fw-semibold">Date</th>
+                  <th class="px-3 py-3 fw-semibold">Customer</th>
+                  <th class="px-3 py-3 fw-semibold">Items</th>
+                  <th class="px-3 py-3 fw-semibold">Status</th>
+                  <th class="px-3 py-3 fw-semibold">Total</th>
+                  <th class="px-3 py-3 fw-semibold text-end">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="ordersTbody">
+                <tr class="loading-row">
+                  <td colspan="7" class="p-5 text-center text-muted">Loading orders...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer-section">
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col-lg-4 col-md-6 mb-4">
+            <h3 class="footer-logo mb-3">LuxeGear</h3>
+            <p class="text-white-50">Crafting moments of elegance and pure satisfaction in every detail.</p>
+            <div class="social-links d-flex gap-3 mt-4">
+              <a href="https://www.facebook.com" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+              <a href="https://www.instagram.com" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+              <a href="https://www.twitter.com" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+              <a href="https://www.twitch.tv" aria-label="Twitch"><i class="fa-brands fa-twitch"></i></a>
+              <a href="https://www.youtube.com" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="footer-title mb-4">Quick Links</h5>
+            <ul class="list-unstyled">
+              <li><a href="home.html" aria-label="Home">Home</a></li>
+              <li><a href="products.html" aria-label="Category">Category</a></li>
+              <li><a href="about.html" aria-label="About Us">About Us</a></li>
+              <li><a href="contact.html" aria-label="Contact Us">Contact Us</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="footer-title mb-4">Support</h5>
+            <ul class="list-unstyled">
+              <li><a href="#" aria-label="Shipping Policy">Shipping Policy</a></li>
+              <li><a href="#" aria-label="Return Policy">Return Policy</a></li>
+              <li><a href="#" aria-label="FAQs">FAQs</a></li>
+              <li><a href="#" aria-label="Terms & Conditions">Terms & Conditions</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="footer-title mb-4">Contact Info</h5>
+            <ul class="list-unstyled text-white-50">
+              <li class="mb-2"><i class="fa-solid fa-location-dot me-2 text-gold"></i> Cairo, Egypt</li>
+              <li class="mb-2"><i class="fa-solid fa-phone me-2 text-gold"></i> +20 123 456 789</li>
+              <li class="mb-2"><i class="fa-solid fa-envelope me-2 text-gold"></i> info@LuxeGear.com</li>
+            </ul>
+          </div>
+        </div>
+
+        <hr class="footer-divider" />
+        <div class="text-center py-3">
+          <p class="mb-0 text-white-50">© 2026 LuxeGear Store. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/logout.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>

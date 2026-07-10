@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LuxeGear | Premium Collections</title>
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/sultan.css" />
+    <link rel="stylesheet" href="css/produts.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  </head>
+
+  <body>
+    <div id="navbar-placeholder"></div>
+    <main class="container main-content">
+      <div class="layout-grid">
+        <aside class="sidebar">
+          <div class="filter-box">
+            <h2>Filters</h2>
+
+            <div class="filter-group">
+              <label>Search</label>
+              <input
+                type="text"
+                id="search-input"
+                class="select-input"
+                placeholder="Search products..."
+                style="width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid var(--border)" />
+            </div>
+
+            <div class="filter-group">
+              <label>Category</label>
+              <select id="category-filter" class="select-input" style="width: 100%">
+                <option value="">All Categories</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label>Price Range</label>
+              <div style="display: flex; gap: 10px">
+                <input type="number" id="min-price" placeholder="Min $" style="width: 50%; padding: 8px; border-radius: 6px; border: 1px solid var(--border)" />
+                <input type="number" id="max-price" placeholder="Max $" style="width: 50%; padding: 8px; border-radius: 6px; border: 1px solid var(--border)" />
+              </div>
+            </div>
+
+            <button id="apply-filters-btn" class="primary-btn full-width mt-md">Apply Filters</button>
+          </div>
+        </aside>
+
+        <div class="products-area">
+          <div class="sort-bar">
+            <div class="results-text">Showing <strong>10</strong> results</div>
+            <div class="sort-actions">
+              <label>Sort by:</label>
+              <select id="sort-select" class="select-transparent">
+                <option value="newest">Newest First</option>
+                <option value="price_asc">Price: Low to High</option>
+                <option value="price_desc">Price: High to Low</option>
+              </select>
+              <div class="divider"></div>
+              <button class="icon-btn active" id="btn-grid"><span class="material-symbols-outlined">grid_view</span></button>
+              <button class="icon-btn" id="btn-list"><span class="material-symbols-outlined">list</span></button>
+            </div>
+          </div>
+
+          <div class="product-grid" id="grid-view"></div>
+
+          <div class="table-container" id="list-view" style="display: none">
+            <table class="product-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Rating</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="product-tbody"></tbody>
+            </table>
+          </div>
+
+          <div class="pagination" id="pagination-container"></div>
+        </div>
+      </div>
+    </main>
+    <footer class="footer-section">
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col-lg-4 col-md-6 mb-4">
+            <h3 class="footer-logo mb-3">LuxeGear</h3>
+            <p class="text-white-50">Crafting moments of elegance and pure satisfaction in every detail.</p>
+            <div class="social-links d-flex gap-3 mt-4">
+              <a href="https://www.facebook.com" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+              <a href="https://www.instagram.com" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+              <a href="https://www.twitter.com" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+              <a href="https://www.twitch.tv" aria-label="Twitch"><i class="fa-brands fa-twitch"></i></a>
+              <a href="https://www.youtube.com" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="footer-title mb-4">Quick Links</h5>
+            <ul class="list-unstyled">
+              <li><a href="home.html" aria-label="Home">Home</a></li>
+              <li><a href="categories.html" aria-label="Category">Category</a></li>
+              <li><a href="about.html" aria-label="About Us">About Us</a></li>
+              <li><a href="contact.html" aria-label="Contact Us">Contact Us</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="footer-title mb-4">Support</h5>
+            <ul class="list-unstyled">
+              <li><a href="#" aria-label="Shipping Policy">Shipping Policy</a></li>
+              <li><a href="#" aria-label="Return Policy">Return Policy</a></li>
+              <li><a href="#" aria-label="FAQs">FAQs</a></li>
+              <li><a href="#" aria-label="Terms & Conditions">Terms & Conditions</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="footer-title mb-4">Contact Info</h5>
+            <ul class="list-unstyled text-white-50">
+              <li class="mb-2"><i class="fa-solid fa-location-dot me-2 text-gold"></i> Cairo, Egypt</li>
+              <li class="mb-2"><i class="fa-solid fa-phone me-2 text-gold"></i> +20 123 456 789</li>
+              <li class="mb-2"><i class="fa-solid fa-envelope me-2 text-gold"></i> info@LuxeGear.com</li>
+            </ul>
+          </div>
+        </div>
+
+        <hr class="footer-divider" />
+        <div class="text-center py-3">
+          <p class="mb-0 text-white-50">© 2026 LuxeGear Store. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navbar.js"></script>
+    <script src="js/produts.js"></script>
+  </body>
+</html>

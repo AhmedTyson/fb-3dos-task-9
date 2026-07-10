@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ImageCacheController;
 
 Route::post('/register', [AuthController::class, 'register'])->name('register');
-Route::post('/login',    [AuthController::class, 'login'])->middleware('throttle:5,1')->name('login');
+Route::post('/login',    [AuthController::class, 'login'])->name('login');
 Route::post('/forgot-password', [PasswordController::class, 'forgetPassword'])->middleware('throttle:3,60');
 Route::post('/reset-password',  [PasswordController::class, 'resetPassword'])->middleware('throttle:5,30');
 
@@ -31,6 +31,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::get('/orders',                [OrderController::class, 'index']);
     Route::post('/orders',               [OrderController::class, 'store']);
     Route::get('/orders/{order}',        [OrderController::class, 'show']);
+    Route::get('/orders/{order}/print-file', [OrderController::class, 'printFile']);
     Route::put('/orders/{order}/cancel', [OrderController::class, 'cancel']);
 });
 
@@ -53,8 +54,8 @@ Route::middleware(['auth:api', 'isAdmin'])->group(function () {
     });
 });
 
-Route::get('/products',           [ProductController::class, 'index'])->middleware('cache.json:5');
+Route::get('/products',           [ProductController::class, 'index'])->middleware('cache.json:60');
 Route::get('/products/{product}', [ProductController::class, 'show']);
-Route::get('/categories', [CategoryController::class, 'index'])->middleware('cache.json:5');
+Route::get('/categories', [CategoryController::class, 'index'])->middleware('cache.json:60');
 
 Route::get('/storage/{path}', [ImageCacheController::class, 'show'])->where('path', '.*');

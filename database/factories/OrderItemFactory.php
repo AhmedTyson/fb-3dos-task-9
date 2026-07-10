@@ -15,7 +15,7 @@ class OrderItemFactory extends Factory
     {
         return [
             'order_id' => Order::factory(),
-            'product_id' => Product::inRandomOrder()->value('id') ?? Product::factory(),
+            'product_id' => Product::inRandomOrder()->value('id'),
             'quantity' => fake()->numberBetween(1, 5),
             'unit_price' => fake()->randomFloat(2, 10, 500),
             'subtotal' => 0, // calculated on create

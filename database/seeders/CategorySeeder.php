@@ -17,10 +17,9 @@ class CategorySeeder extends Seeder
             ['name' => 'Webcams'],
             ['name' => 'USB Hubs'],
             ['name' => 'Cables & Adapters'],
-            ['name' => 'Microphones'],
-            ['name' => 'Lighting'],
             ['name' => 'Storage'],
             ['name' => 'Audio'],
+            ['name' => 'Lighting'],
         ];
 
         foreach ($categories as $category) {

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="./css/login.css">
+</head>
+
+<body>
+    <div class="login">
+        <div class="icon">
+            <!-- <i class="fa-solid fa-user"></i> -->
+            <a href="#" class="home-link">
+                <i class="fa-solid fa-house"></i>
+                <span class="hover-text">Back to Home</span>
+            </a>
+            <button id="theme-toggle" class="theme-btn"><i class="fa-solid fa-moon"></i></button>
+        </div>
+        <h1>Login</h1>
+
+        <form>
+            <div class="input">
+
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="rana25@gmail.com" required>
+                <p id="emailMsg" class="error-msg d-none">Please enter a valid email address.</p>
+
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+                <p id="passwordMsg" class="error-msg d-none">Password cannot be empty.</p>
+            </div>
+            <div class="checkbox">
+                <label><input type="checkbox" id="check"> Remember me</label>
+                <a href="forgotpassword.html">Forgot Password?</a>
+            </div>
+            <button type="submit" class="submitBtn" id="login">Sign In <i class="fa-solid fa-arrow-right"></i></button>
+            <p class="register-link">Don't have an account? <a href="register.html">Register</a></p>
+        </form>
+    </div>
+    <script src="./js/config.js"></script>
+    <script src="./js/auth.js"></script>
+    <script src="./js/login.js"></script>
+    <script src="./js/theme.js"></script>
+</body>
+
+</html>

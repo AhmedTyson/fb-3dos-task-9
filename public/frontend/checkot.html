@@ -1,0 +1,224 @@
+<!doctype html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Secure Checkout | LuxeGear Premium</title>
+
+    <!-- FontAwesome & Bootstrap CSS -->
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/sultan.css" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/checkot.css" />
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/navbar.js"></script>
+    <script>
+        if (!Auth.requireAuth()) {
+            window.location.href = "login.html";
+        }
+    </script>
+  </head>
+  <body class="bg-light text-dark">
+    <div id="navbar-placeholder"></div>
+
+    <!-- Main Content Area -->
+    <main class="container main-content-padding pb-5">
+      <div class="row g-4 align-items-start">
+        
+        <!-- Left Column: Checkout Flow -->
+        <div class="col-lg-7">
+          <div class="d-flex flex-column gap-4">
+            <!-- Secure Header -->
+            <div class="d-flex align-items-center gap-2">
+              <span class="material-symbols-outlined filled text-primary fs-2">lock</span>
+              <h1 class="h2 fw-semibold m-0 text-dark">Secure Checkout</h1>
+            </div>
+
+            <!-- Shipping Address Form -->
+            <section class="glass-card p-4 p-md-5 rounded-4">
+              <h2 class="h4 fw-semibold mb-4">Shipping Address</h2>
+              <form class="row g-3">
+                <div class="col-12">
+                  <label class="form-label text-muted small fw-medium tracking-wide">Email Address</label>
+                  <input class="form-control form-control-lg custom-input" placeholder="alex@example.com" type="email" required />
+                </div>
+                <div class="col-12">
+                  <label class="form-label text-muted small fw-medium tracking-wide">Phone Number</label>
+                  <input class="form-control form-control-lg custom-input" placeholder="+201012345678" type="tel" required pattern="^\+201[0-9]{8,9}$" title="Egyptian mobile number starting with +201 (e.g., +201012345678)" />
+                </div>
+                <div class="col-12">
+                  <label class="form-label text-muted small fw-medium tracking-wide">Street Address</label>
+                  <input class="form-control form-control-lg custom-input" placeholder="123 Main Street, Apt 4B" type="text" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label text-muted small fw-medium tracking-wide">City</label>
+                  <input class="form-control form-control-lg custom-input" placeholder="Cairo" type="text" required />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label text-muted small fw-medium tracking-wide">Zip Code</label>
+                  <input class="form-control form-control-lg custom-input" placeholder="11511" type="text" required />
+                </div>
+                <div class="col-12">
+                  <label class="form-label text-muted small fw-medium tracking-wide">Country</label>
+                  <input class="form-control form-control-lg custom-input" placeholder="Egypt" type="text" required />
+                </div>
+              </form>
+            </section>
+
+            <!-- Payment Section -->
+            <section class="glass-card p-4 p-md-5 rounded-4">
+              <h2 class="h4 fw-semibold mb-4">Payment</h2>
+              <div class="bg-light border border-primary border-opacity-10 rounded-3 p-4 d-flex gap-3">
+                <span class="material-symbols-outlined text-primary fs-3">payments</span>
+                <div>
+                  <p class="fw-bold text-dark mb-1">Cash on Delivery</p>
+                  <p class="text-muted small mb-0 lh-base">Cash on Delivery is currently the only available payment method. Please have the exact amount ready upon delivery.</p>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+
+        <!-- Right Column: Order Summary (Sticky) -->
+        <div class="col-lg-5 position-lg-sticky top-sticky-offset">
+          <div class="glass-card p-4 p-md-5 rounded-4 border border-primary border-opacity-10">
+            <h2 class="h4 fw-semibold mb-4">Order Summary</h2>
+
+            <!-- Cart Items -->
+            <div class="d-flex flex-column gap-4 mb-4 overflow-auto pr-2 custom-scrollbar" style="max-height: 320px;">
+              <!-- Item 1 -->
+              <div class="d-flex gap-3 align-items-center product-group">
+                <div class="position-relative bg-secondary bg-opacity-10 rounded-3 overflow-hidden flex-shrink-0" style="width: 80px; height: 80px;">
+                  <img class="w-100 h-100 object-fit-cover product-img" alt="Titanium Watch" src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=200&q=80" />
+                  <span class="position-absolute top-0 end-0 bg-primary text-white badge rounded-0 rounded-bottom rounded-start font-bold" style="font-size: 10px;">1</span>
+                </div>
+                <div class="flex-grow-1">
+                  <h3 class="fs-6 fw-semibold text-dark mb-0">Luxe Zenith Watch</h3>
+                  <p class="text-muted small mb-1">Titanium / Black Leather</p>
+                  <p class="fw-bold mb-0">$499.00</p>
+                </div>
+              </div>
+
+              <!-- Item 2 -->
+              <div class="d-flex gap-3 align-items-center product-group">
+                <div class="position-relative bg-secondary bg-opacity-10 rounded-3 overflow-hidden flex-shrink-0" style="width: 80px; height: 80px;">
+                  <img class="w-100 h-100 object-fit-cover product-img" alt="Headphones" src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=200&q=80" />
+                  <span class="position-absolute top-0 end-0 bg-primary text-white badge rounded-0 rounded-bottom rounded-start font-bold" style="font-size: 10px;">1</span>
+                </div>
+                <div class="flex-grow-1">
+                  <h3 class="fs-6 fw-semibold text-dark mb-0">Precision Audio ANC</h3>
+                  <p class="text-muted small mb-1">Matte Graphite</p>
+                  <p class="fw-bold mb-0">$299.00</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Totals -->
+<div class="d-flex flex-column gap-2 pt-4 border-top border-secondary border-opacity-10">
+  <div class="d-flex justify-content-between text-muted">
+	<span>Subtotal</span>
+	<span id="summary-subtotal">0.00 LE</span>
+  </div>
+  <div class="d-flex justify-content-between text-muted">
+	<span>Shipping</span>
+	<span id="summary-shipping">15.00 LE</span>
+  </div>
+  <div class="d-flex justify-content-between text-muted">
+	<span>Estimated Taxes</span>
+	<span id="summary-taxes">0.00 LE</span>
+  </div>
+  <div class="d-flex justify-content-between text-dark fw-bold pt-3 mt-2 border-top border-secondary border-opacity-10">
+	<span>Total</span>
+	<span class="text-primary" id="summary-total">0.00 LE</span>
+  </div>
+</div>
+
+            <!-- Action Button -->
+            <button class="btn btn-primary w-100 py-3 mt-4 fw-medium d-flex align-items-center justify-content-center gap-2 btn-complete">
+              Complete Purchase
+              <span class="material-symbols-outlined fs-5">arrow_forward</span>
+            </button>
+
+            <!-- Trust Badges -->
+            <div class="mt-4 pt-4 border-top border-secondary border-opacity-10">
+              <div class="d-flex justify-content-center gap-4 opacity-50 mb-3 badges-hover">
+                <span class="material-symbols-outlined fs-4" title="Secure Payment">verified_user</span>
+                <span class="material-symbols-outlined fs-4" title="Express Shipping">local_shipping</span>
+                <span class="material-symbols-outlined fs-4" title="24/7 Support">support_agent</span>
+              </div>
+              <p class="text-center text-muted text-uppercase tracking-wider m-0" style="font-size: 10px;">Secured by industry-standard 256-bit SSL encryption</p>
+            </div>
+          </div>
+
+          <!-- Payment Method Icons -->
+          <div class="d-flex justify-content-center align-items-center gap-4 opacity-50 px-4 pt-3">
+            <span class="material-symbols-outlined fs-2" title="Cash on Delivery">local_shipping</span>
+            <span class="material-symbols-outlined fs-2" title="Payments">payments</span>
+            <span class="material-symbols-outlined fs-2" title="Receipt">receipt_long</span>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="footer-section">
+      <div class="container">
+        <div class="row justify-content-between">
+          <div class="col-lg-4 col-md-6 mb-4">
+            <h3 class="footer-logo mb-3">LuxeGear</h3>
+            <p class="text-white-50">Crafting moments of elegance and pure satisfaction in every detail.</p>
+            <div class="social-links d-flex gap-3 mt-4">
+              <a href="https://www.facebook.com" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+              <a href="https://www.instagram.com" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+              <a href="https://www.twitter.com" aria-label="Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+              <a href="https://www.twitch.tv" aria-label="Twitch"><i class="fa-brands fa-twitch"></i></a>
+              <a href="https://www.youtube.com" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+            </div>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="footer-title mb-4">Quick Links</h5>
+            <ul class="list-unstyled">
+              <li><a href="home.html" aria-label="Home">Home</a></li>
+              <li><a href="categories.html" aria-label="Category">Category</a></li>
+              <li><a href="about.html" aria-label="About Us">About Us</a></li>
+              <li><a href="contact.html" aria-label="Contact Us">Contact Us</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="footer-title mb-4">Support</h5>
+            <ul class="list-unstyled">
+              <li><a href="#" aria-label="Shipping Policy">Shipping Policy</a></li>
+              <li><a href="#" aria-label="Return Policy">Return Policy</a></li>
+              <li><a href="#" aria-label="FAQs">FAQs</a></li>
+              <li><a href="#" aria-label="Terms & Conditions">Terms & Conditions</a></li>
+            </ul>
+          </div>
+
+          <div class="col-lg-2 col-md-6 mb-4">
+            <h5 class="footer-title mb-4">Contact Info</h5>
+            <ul class="list-unstyled text-white-50">
+              <li class="mb-2"><i class="fa-solid fa-location-dot me-2 text-gold"></i> Cairo, Egypt</li>
+              <li class="mb-2"><i class="fa-solid fa-phone me-2 text-gold"></i> +20 123 456 789</li>
+              <li class="mb-2"><i class="fa-solid fa-envelope me-2 text-gold"></i> info@LuxeGear.com</li>
+            </ul>
+          </div>
+        </div>
+
+        <hr class="footer-divider" />
+        <div class="text-center py-3">
+          <p class="mb-0 text-white-50">© 2026 LuxeGear Store. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Custom Script -->
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/checkot.js"></script>
+  </body>
+</html>
